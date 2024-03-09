@@ -51,7 +51,6 @@ fun SignUpScreen(){
             Spacer(modifier = Modifier.height(80.dp))
             ButtonComponent(value = stringResource(id = R.string.register))
             Spacer(modifier = Modifier.height(20.dp))
-            DividerTextComponent()
             ClickableLoginTextComponent(onTextSelected = {
                 PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
             })
