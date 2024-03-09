@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "398778953893",
+    "project_id": "kino-dbc21",
+    "storage_bucket": "kino-dbc21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398778953893:android:5563328252980fdd055d4c",
+        "android_client_info": {
+          "package_name": "com.example.kino"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtqVvMlAhjNwYuI_xxv3O1PvjB9I1VqY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

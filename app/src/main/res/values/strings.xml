@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Kino</string>
+    <string name="hello">Hello there,</string>
+    <string name="create_account">Create an Account,</string>
+    <string name="welcome">Welcome back,</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="hide_pass">"Hide password"</string>
+    <string name="show_pass">"Show password"</string>
+    <string name="terms_and_conditions">"By continuing you accept our Privacy Policy and Term on Use"</string>
+    <string name="terms_and_conditions_header">"Term of Use"</string>
+    <string name="or">"or"</string>
+    <string name="go_to_login">"Already have an account? Login"</string>
+    <string name="forgot_password">Forgot your password</string>
+
+</resources>
