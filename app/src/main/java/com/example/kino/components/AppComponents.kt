@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.sp
 import com.example.kino.R
 
 @Composable
-fun NormalTextComponent(value: String){
+fun NormalTextComponent(value: String) {
     Text(
         text = value,
         modifier = Modifier
@@ -78,7 +78,7 @@ fun NormalTextComponent(value: String){
 }
 
 @Composable
-fun HeadingTextComponent(value: String){
+fun HeadingTextComponent(value: String) {
     Text(
         text = value,
         modifier = Modifier
@@ -94,7 +94,12 @@ fun HeadingTextComponent(value: String){
 }
 
 @Composable
-fun MyTextFieldComponent(labelValue: String, painterResource: Painter){
+fun MyTextFieldComponent(
+    labelValue: String,
+    painterResource: Painter,
+    onTextSelected: (String) -> Unit,
+    errorStatus: Boolean = false,
+) {
     val textValue = remember { mutableStateOf("") }
     OutlinedTextField(
         modifier = Modifier
@@ -103,18 +108,26 @@ fun MyTextFieldComponent(labelValue: String, painterResource: Painter){
         shape = RoundedCornerShape(50),
         value = textValue.value,
         label = { Text(text = labelValue) },
-        onValueChange = {textValue.value = it},
+        onValueChange = {
+            textValue.value = it
+            onTextSelected(it)
+        },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         singleLine = true,
         maxLines = 1,
         leadingIcon = {
-            Icon(modifier = Modifier.height(10.dp), painter = painterResource, contentDescription = "")
-        }
+            Icon(
+                modifier = Modifier.height(10.dp),
+                painter = painterResource,
+                contentDescription = ""
+            )
+        },
+        isError = !errorStatus
     )
 }
 
 @Composable
-fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter){
+fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onTextSelected: (String) -> Unit, errorStatus: Boolean = false) {
     val localFocusManager = LocalFocusManager.current
     val password = remember { mutableStateOf("") }
     val passwordVisibile = remember { mutableStateOf(false) }
@@ -125,51 +138,65 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter){
         shape = RoundedCornerShape(50),
         value = password.value,
         label = { Text(text = labelValue) },
-        onValueChange = {password.value = it},
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        onValueChange = { password.value = it
+                        onTextSelected(it)},
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done
+        ),
         singleLine = true,
         maxLines = 1,
-        keyboardActions = KeyboardActions{
+        keyboardActions = KeyboardActions {
             localFocusManager.clearFocus()
         },
         leadingIcon = {
-            Icon(modifier = Modifier.height(10.dp), painter = painterResource, contentDescription = "")
+            Icon(
+                modifier = Modifier.height(10.dp),
+                painter = painterResource,
+                contentDescription = ""
+            )
         },
         trailingIcon = {
-            val iconImage = if(passwordVisibile.value){
+            val iconImage = if (passwordVisibile.value) {
                 Icons.Filled.Visibility
-            //painterResource(id = R.drawable.eye)
-            }else{
+                //painterResource(id = R.drawable.eye)
+            } else {
                 Icons.Filled.VisibilityOff
             }
 
-            val description = if(passwordVisibile.value){
+            val description = if (passwordVisibile.value) {
                 stringResource(id = R.string.hide_pass)
-            }else{
+            } else {
                 stringResource(id = R.string.show_pass)
             }
 
-            IconButton(onClick = {passwordVisibile.value = !passwordVisibile.value}){
+            IconButton(onClick = { passwordVisibile.value = !passwordVisibile.value }) {
                 Icon(imageVector = iconImage, contentDescription = null)
             }
         },
 
-        visualTransformation = if(passwordVisibile.value) VisualTransformation.None else PasswordVisualTransformation()
-
+        visualTransformation = if (passwordVisibile.value) VisualTransformation.None else PasswordVisualTransformation(),
+        isError = !errorStatus
     )
 }
 
 @Composable
-fun CheckboxComponent(value: String,  onTextSelected: (String) -> Unit){
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .heightIn(56.dp),
+fun CheckboxComponent(value: String, onTextSelected: (String) -> Unit, onCheckedChange: (Boolean)-> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(56.dp),
         verticalAlignment = Alignment.CenterVertically
-    ){
-        val checkedState = remember{
+    ) {
+        val checkedState = remember {
             mutableStateOf(false)
         }
-        Checkbox(checked = checkedState.value, onCheckedChange = {checkedState.value = !checkedState.value})
+        Checkbox(
+            checked = checkedState.value,
+            onCheckedChange = {
+                checkedState.value = !checkedState.value
+                onCheckedChange.invoke(it)
+            })
         ClickableTextComponent(value = value, onTextSelected = onTextSelected)
     }
 }
@@ -202,17 +229,22 @@ fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit) {
         }
     })
 }
-    
+
 @Composable
-fun ButtonComponent(value: String){
-        Button(onClick = { /*TODO*/ },
+fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boolean = false) {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(48.dp),
+        contentPadding = PaddingValues(),
+        onClick = {
+            onButtonClicked.invoke()
+        },
+        colors = ButtonDefaults.buttonColors(Color.Transparent),
+        enabled = isEnabled
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(48.dp),
-            contentPadding = PaddingValues(),
-            colors = ButtonDefaults.buttonColors(Color.Transparent)
-        ) {
-            Box(modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(48.dp)
                 .background(
@@ -224,36 +256,41 @@ fun ButtonComponent(value: String){
                     ),
                     shape = RoundedCornerShape(50.dp)
                 ),
-                contentAlignment = Alignment.Center
-            ){
-                Text(text = value,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = value,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
+    }
 }
 
 @Composable
-fun DividerTextComponent(){
-    Row(modifier = Modifier.fillMaxWidth(),
+fun DividerTextComponent() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
-    ){
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f),
+    ) {
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             color = Color.Gray,
             thickness = 1.dp
         )
-        Text(modifier = Modifier.padding(8.dp),
+        Text(
+            modifier = Modifier.padding(8.dp),
             text = stringResource(id = R.string.or),
             fontSize = 14.sp,
             color = colorResource(id = R.color.colorText)
         )
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f),
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             color = Color.Gray,
             thickness = 1.dp
         )
@@ -264,8 +301,9 @@ fun DividerTextComponent(){
 fun ClickableLoginTextComponent(tryingToLogin: Boolean = true, onTextSelected: (String) -> Unit) {
 
 
-    val initialText = if(tryingToLogin) "Already have an accout? " else "Don't have an account yet? "
-    val loginText = if(tryingToLogin) "Login" else "Register"
+    val initialText =
+        if (tryingToLogin) "Already have an accout? " else "Don't have an account yet? "
+    val loginText = if (tryingToLogin) "Login" else "Register"
     val annotatedString = buildAnnotatedString {
         append(initialText)
         withStyle(style = SpanStyle(color = colorResource(id = R.color.purple_200))) {
@@ -276,8 +314,8 @@ fun ClickableLoginTextComponent(tryingToLogin: Boolean = true, onTextSelected: (
 
     ClickableText(
         modifier = Modifier
-        .fillMaxWidth()
-        .heightIn(min = 40.dp),
+            .fillMaxWidth()
+            .heightIn(min = 40.dp),
         text = annotatedString,
         style = TextStyle(
             fontSize = 18.sp,
@@ -292,12 +330,12 @@ fun ClickableLoginTextComponent(tryingToLogin: Boolean = true, onTextSelected: (
                 if (span.item == loginText) {
                     onTextSelected(span.item)
                 }
-        }
-    })
+            }
+        })
 }
 
 @Composable
-fun UnderLinedTextComponent(value: String){
+fun UnderLinedTextComponent(value: String) {
     Text(
         text = value,
         modifier = Modifier
@@ -313,3 +351,6 @@ fun UnderLinedTextComponent(value: String){
         textDecoration = TextDecoration.Underline
     )
 }
+
+
+
