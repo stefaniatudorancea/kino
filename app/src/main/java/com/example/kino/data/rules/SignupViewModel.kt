@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.auth.auth
 
 class SignupViewModel : ViewModel() {
 
@@ -61,7 +63,7 @@ class SignupViewModel : ViewModel() {
 
         createUserInFirebase(
             email = registartionUIState.value.email,
-            password = registartionUIState.value.email
+            password = registartionUIState.value.password
         )
 
     }
@@ -115,10 +117,10 @@ class SignupViewModel : ViewModel() {
 
     private fun createUserInFirebase(email: String, password: String) {
         signUpInProgress.value = true
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password.toString())
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener {
                 Log.d(TAG,"Insider_OnCompleteListener")
-                Log.d(TAG,"isSuccessful = ${it.isSuccessful}")
+                Log.d(TAG,"isSuccessful = ${it.isSuccessful}, ${email}, ${password}")
                 signUpInProgress.value = false
                 if(it.isSuccessful){
                     PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
@@ -133,7 +135,11 @@ class SignupViewModel : ViewModel() {
 
     fun logout(){
         val fireBaseAuth = FirebaseAuth.getInstance()
+        var auth: FirebaseAuth
+        auth = Firebase.auth
+        val currentUser = auth.currentUser
         fireBaseAuth.signOut()
+        Log.d(TAG, "current: $currentUser")
         val authStateListener = AuthStateListener{
             if(it.currentUser == null){
                 Log.d(TAG, "Inside sign out success")
