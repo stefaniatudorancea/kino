@@ -1,18 +1,20 @@
-package com.example.kino.data.rules
+package com.example.kino.rules.signup
 
-import androidx.lifecycle.ViewModel
+data class SignUpUIState(
 
-data class RegistrationUIState(
+    var photoUrl: String = "",
     var firstName: String = "",
     var lastName: String = "",
     var email: String = "",
     var password: String = "",
-    var privacyPolicyAccepted: Boolean = false,
 
     var firstNameError: Boolean = false,
     var lastNameError: Boolean = false,
     var emailError: Boolean = false,
     var passwordError: Boolean = false,
+
+
+    var privacyPolicyAccepted: Boolean = false,
     var privacyPolicyError: Boolean = false
 ) {
 

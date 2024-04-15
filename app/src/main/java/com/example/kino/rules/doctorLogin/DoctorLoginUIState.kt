@@ -1,8 +1,6 @@
-package com.example.kino.data.rules
+package com.example.kino.rules.doctorLogin
 
-import androidx.lifecycle.ViewModel
-
-data class LoginUIState(
+data class DoctorLoginUIState(
     var email: String = "",
     var password: String = "",
 

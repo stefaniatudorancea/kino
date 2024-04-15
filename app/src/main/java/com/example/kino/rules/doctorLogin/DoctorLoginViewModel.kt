@@ -1,32 +1,36 @@
-package com.example.kino.data.rules
+package com.example.kino.rules.doctorLogin
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.kino.data.Validator
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
 
-class LoginViewModel: ViewModel() {
-    private val TAG = LoginViewModel::class.simpleName
-    var loginUIState = mutableStateOf(LoginUIState())
+class DoctorLoginViewModel: ViewModel() {
+    private val TAG = DoctorLoginViewModel::class.simpleName
+    var loginUIState = mutableStateOf(DoctorLoginUIState())
     var allValidationsPassed = mutableStateOf(false)
     var loginInProcess = mutableStateOf(false)
 
-    fun onEvent(event:LoginUIEvent){
+    fun onEvent(event: DoctorLoginUIEvent){
         when(event){
-            is LoginUIEvent.EmailChanged -> {
+            is DoctorLoginUIEvent.EmailChanged -> {
                 loginUIState.value = loginUIState.value.copy(
                     email = event.email
                 )
             }
-            is LoginUIEvent.PasswordChanged -> {
+            is DoctorLoginUIEvent.PasswordChanged -> {
                 loginUIState.value = loginUIState.value.copy(
                     password = event.password
                 )
             }
-            is LoginUIEvent.LoginButtonClicked -> {
+            is DoctorLoginUIEvent.LoginButtonClicked -> {
                 login()
+            }
+            is DoctorLoginUIEvent.PatientButtonClicked -> {
+                PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
             }
         }
         validateLoginUIDataWithRules()

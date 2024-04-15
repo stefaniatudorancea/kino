@@ -1,35 +1,37 @@
 package com.example.kino.components
 
+
+import android.net.Uri
 import android.util.Log
-import android.widget.CheckBox
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Colors
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +40,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,8 +51,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 import com.example.kino.R
 
 @Composable
@@ -96,9 +97,10 @@ fun HeadingTextComponent(value: String) {
 @Composable
 fun MyTextFieldComponent(
     labelValue: String,
-    painterResource: Painter,
+    painterResource: Painter?,
     onTextSelected: (String) -> Unit,
     errorStatus: Boolean = false,
+    fieldForNumbers: Boolean = false
 ) {
     val textValue = remember { mutableStateOf("") }
     OutlinedTextField(
@@ -108,27 +110,33 @@ fun MyTextFieldComponent(
         shape = RoundedCornerShape(50),
         value = textValue.value,
         label = { Text(text = labelValue) },
-        onValueChange = {
-            textValue.value = it
-            onTextSelected(it)
+        onValueChange = {newValue ->
+            if(!fieldForNumbers){
+                textValue.value = newValue
+            }else{
+                textValue.value = newValue.filter { it.isDigit() }
+            }
+            onTextSelected(newValue)
         },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        //keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         singleLine = true,
-        maxLines = 1,
+        maxLines= 1,
         leadingIcon = {
-            Icon(
-                modifier = Modifier.height(10.dp),
-                painter = painterResource,
-                contentDescription = ""
-            )
+            painterResource?.let {
+                Icon(
+                    modifier = Modifier.height(10.dp),
+                    painter = it,
+                    contentDescription = ""
+                )
+            }
         },
-        isError = !errorStatus
+        isError = !errorStatus,
+
     )
 }
 
 @Composable
 fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onTextSelected: (String) -> Unit, errorStatus: Boolean = false) {
-    val localFocusManager = LocalFocusManager.current
     val password = remember { mutableStateOf("") }
     val passwordVisibile = remember { mutableStateOf(false) }
     OutlinedTextField(
@@ -140,15 +148,15 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onT
         label = { Text(text = labelValue) },
         onValueChange = { password.value = it
                         onTextSelected(it)},
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
+//        keyboardOptions = KeyboardOptions(
+//            keyboardType = KeyboardType.Password,
+//            imeAction = ImeAction.Done
+//        ),
         singleLine = true,
         maxLines = 1,
-        keyboardActions = KeyboardActions {
-            localFocusManager.clearFocus()
-        },
+//        keyboardActions = KeyboardActions {
+//            localFocusManager.clearFocus()
+//        },
         leadingIcon = {
             Icon(
                 modifier = Modifier.height(10.dp),
@@ -164,12 +172,6 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onT
                 Icons.Filled.VisibilityOff
             }
 
-            val description = if (passwordVisibile.value) {
-                stringResource(id = R.string.hide_pass)
-            } else {
-                stringResource(id = R.string.show_pass)
-            }
-
             IconButton(onClick = { passwordVisibile.value = !passwordVisibile.value }) {
                 Icon(imageVector = iconImage, contentDescription = null)
             }
@@ -181,7 +183,7 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onT
 }
 
 @Composable
-fun CheckboxComponent(value: String, onTextSelected: (String) -> Unit, onCheckedChange: (Boolean)-> Unit) {
+fun CheckboxComponent(onTextSelected: (String) -> Unit, onCheckedChange: (Boolean)-> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,12 +199,12 @@ fun CheckboxComponent(value: String, onTextSelected: (String) -> Unit, onChecked
                 checkedState.value = !checkedState.value
                 onCheckedChange.invoke(it)
             })
-        ClickableTextComponent(value = value, onTextSelected = onTextSelected)
+        ClickableTextComponent(onTextSelected = onTextSelected)
     }
 }
 
 @Composable
-fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit) {
+fun ClickableTextComponent(onTextSelected: (String) -> Unit) {
     val initialText = "By continuing you accept our "
     val privacyPolicyText = "Privacy Policy "
     val andText = "and"
@@ -231,11 +233,12 @@ fun ClickableTextComponent(value: String, onTextSelected: (String) -> Unit) {
 }
 
 @Composable
-fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boolean = false) {
+fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boolean = false, brush: Brush, imageVector: ImageVector?) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(48.dp),
+            .heightIn(48.dp)
+            .padding(horizontal = 40.dp),
         contentPadding = PaddingValues(),
         onClick = {
             onButtonClicked.invoke()
@@ -248,22 +251,24 @@ fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boole
                 .fillMaxWidth()
                 .heightIn(48.dp)
                 .background(
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            colorResource(id = R.color.primaryPurple),
-                            colorResource(id = R.color.secondaryPurple),
-                        )
-                    ),
+                    brush = brush,
                     shape = RoundedCornerShape(50.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = value,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            Row {
+                Text(
+                    text = value,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                if (imageVector != null) {
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Icon(imageVector = imageVector, contentDescription = "Next page", tint = Color.White)
+                }
+            }
+
         }
     }
 }
@@ -274,12 +279,12 @@ fun DividerTextComponent() {
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            color = Color.Gray,
-            thickness = 1.dp
+            thickness = 1.dp,
+            color = Color.Gray
         )
         Text(
             modifier = Modifier.padding(8.dp),
@@ -287,12 +292,12 @@ fun DividerTextComponent() {
             fontSize = 14.sp,
             color = colorResource(id = R.color.colorText)
         )
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            color = Color.Gray,
-            thickness = 1.dp
+            thickness = 1.dp,
+            color = Color.Gray
         )
     }
 }
@@ -351,6 +356,50 @@ fun UnderLinedTextComponent(value: String) {
         textDecoration = TextDecoration.Underline
     )
 }
+
+@Composable
+fun ImageViewer(imageUri: Uri?, imageUrl: String?, onButtonClicked: () -> Unit) {
+    val painter = if (imageUrl != null) rememberImagePainter(imageUrl)
+    else if (imageUri != null) rememberImagePainter(imageUri)
+    else painterResource(id = R.drawable.default_profile)
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .size(120.dp)
+            .clip(CircleShape)
+            .clickable(onClick = onButtonClicked),
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = "Profile Image",
+            modifier = Modifier
+                .fillMaxSize()
+                .border(2.dp, Color.Gray, CircleShape),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+
+//@Composable
+//fun ImageViewer(imageUri: Uri?, imageUrl: String?, onButtonClicked: () -> Unit) {
+//    val painter = if (imageUrl != null) rememberImagePainter(imageUrl) else if (imageUri != null) rememberImagePainter(imageUri) else painterResource(id = R.drawable.default_profile)
+//
+//    Image(
+//        painter = painter,
+//        contentDescription = "Profile Image",
+//        modifier = Modifier
+//            .size(120.dp)
+//            .clip(CircleShape)
+//            .border(2.dp, Color.Gray, CircleShape),
+//        contentScale = ContentScale.Crop
+//
+//    )
+//}
+
+
+
 
 
 

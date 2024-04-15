@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -27,32 +28,32 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kino.R
 import com.example.kino.components.ButtonComponent
-import com.example.kino.navigation.PostOfficeAppRouter
-import com.example.kino.navigation.Screen
-import com.example.kino.components.CheckboxComponent
 import com.example.kino.components.ClickableLoginTextComponent
 import com.example.kino.components.DividerTextComponent
 import com.example.kino.components.HeadingTextComponent
 import com.example.kino.components.ImageViewer
 import com.example.kino.components.MyTextFieldComponent
 import com.example.kino.components.PasswordTextFieldComponent
-import com.example.kino.rules.signup.SignupViewModel
+import com.example.kino.navigation.PostOfficeAppRouter
+import com.example.kino.navigation.Screen
+import com.example.kino.rules.doctorSignup.DoctorSignupUIEvent
+import com.example.kino.rules.doctorSignup.DoctorSignupViewModel
 import com.example.kino.rules.signup.SignupUIEvent
 
 @Composable
-fun SignUpScreen(signupViewModel: SignupViewModel = viewModel()) {
-    val imageUri by signupViewModel.imageUri.observeAsState()
-    val imageUrl by signupViewModel.imageUrl.observeAsState()
+fun DoctorFirstSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = viewModel()){
+    val imageUri by doctorSignupViewModel.imageUri.observeAsState()
+    val imageUrl by doctorSignupViewModel.imageUrl.observeAsState()
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            signupViewModel.setImageUri(uri)
+            doctorSignupViewModel.setImageUri(uri)
         }
     )
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Surface(
             color = Color.White,
             modifier = Modifier
@@ -60,7 +61,10 @@ fun SignUpScreen(signupViewModel: SignupViewModel = viewModel()) {
                 .background(Color.White)
                 .padding(28.dp)
         ) {
-            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 HeadingTextComponent(value = stringResource(id = R.string.create_account))
                 Spacer(modifier = Modifier.height(20.dp))
                 ImageViewer(imageUri = imageUri, imageUrl = imageUrl, {imagePickerLauncher.launch("image/*")})
@@ -69,81 +73,67 @@ fun SignUpScreen(signupViewModel: SignupViewModel = viewModel()) {
                     labelValue = stringResource(id = R.string.first_name),
                     painterResource = painterResource(id = R.drawable.user),
                     onTextSelected = {
-                        signupViewModel.onEvent(SignupUIEvent.FirstNameChanged(it))
+                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.FirstNameChanged(it))
                     },
-                    errorStatus = signupViewModel.registartionUIState.value.firstNameError
+                    errorStatus = doctorSignupViewModel.registartionUIState.value.firstNameError
                 )
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.last_name),
                     painterResource = painterResource(id = R.drawable.user),
                     onTextSelected = {
-                        signupViewModel.onEvent(SignupUIEvent.LastNameChanged(it))
+                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.LastNameChanged(it))
                     },
-                    errorStatus = signupViewModel.registartionUIState.value.lastNameError
+                    errorStatus = doctorSignupViewModel.registartionUIState.value.lastNameError
                 )
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.email),
                     painterResource = painterResource(id = R.drawable.envelope),
                     onTextSelected = {
-                        signupViewModel.onEvent(SignupUIEvent.EmailChanged(it))
+                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.EmailChanged(it))
                     },
-                    errorStatus = signupViewModel.registartionUIState.value.emailError
+                    errorStatus = doctorSignupViewModel.registartionUIState.value.emailError
                 )
                 PasswordTextFieldComponent(
                     labelValue = stringResource(id = R.string.password),
                     painterResource = painterResource(id = R.drawable.lock),
                     onTextSelected = {
-                        signupViewModel.onEvent(SignupUIEvent.PasswordChanged(it))
+                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.PasswordChanged(it))
                     },
-                    errorStatus = signupViewModel.registartionUIState.value.passwordError
+                    errorStatus = doctorSignupViewModel.registartionUIState.value.passwordError
                 )
-                CheckboxComponent(
-                    onTextSelected = {
-                        PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
-                    },
-                    onCheckedChange = {
-                        signupViewModel.onEvent(SignupUIEvent.PrivacyPolicyCheckBoxClicked(it))
-                    },
-                )
-                Spacer(modifier = Modifier.height(30.dp))
-                ButtonComponent(value = stringResource(id = R.string.register),
+                Spacer(modifier = Modifier.height(40.dp))
+                ButtonComponent(value = stringResource(id = R.string.next_step),
                     onButtonClicked = {
-                        signupViewModel.onEvent(SignupUIEvent.RegisterButtonClicked )
+                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.NextStepButtonClicked )
                     },
-                    isEnabled = signupViewModel.allValidationsPassed.value,
-                    imageVector = null,
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            colorResource(id = R.color.primaryPurple),
-                            colorResource(id = R.color.secondaryPurple),
-                        )
-                    )
-
-                    )
-                //Spacer(modifier = Modifier.height(20.dp))
-                DividerTextComponent()
-                ClickableLoginTextComponent(onTextSelected = {
-                    PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-                })
-                Spacer(modifier = Modifier.height(71.dp))
-                ButtonComponent(value = stringResource(id = R.string.im_physiotherapist),
-                    onButtonClicked = {
-                        signupViewModel.onEvent(SignupUIEvent.PhysioteraphistButtonClicked )
-                    },
-                    isEnabled = true,
-                    imageVector = null,
+                    isEnabled = doctorSignupViewModel.firstValidationsPassed.value,
                     brush = Brush.horizontalGradient(
                         listOf(
                             colorResource(id = R.color.primaryBlue),
                             colorResource(id = R.color.secondaryBlue),
                         )
                     ),
+                    imageVector = Icons.Filled.ArrowForward
+                )
+                DividerTextComponent()
+                ClickableLoginTextComponent(onTextSelected = {
+                    PostOfficeAppRouter.navigateTo(Screen.DoctorLoginScreen)
+                })
+                Spacer(modifier = Modifier.height(118.dp))
+                ButtonComponent(value = stringResource(id = R.string.im_patient),
+                    onButtonClicked = {
+                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.PatientButtonClicked)
+                    },
+                    isEnabled = true,
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            colorResource(id = R.color.primaryPurple),
+                            colorResource(id = R.color.secondaryPurple),
+                        )
+                    ),
+                    imageVector = null
                 )
             }
-        }
-
-        if(signupViewModel.signUpInProgress.value){
-            CircularProgressIndicator()
         }
     }
 }

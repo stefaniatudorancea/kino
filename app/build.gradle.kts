@@ -53,6 +53,10 @@ android {
 dependencies {
 
     implementation("androidx.compose.ui:ui-android:1.6.3")
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("androidx.compose.material3:material3-android:1.2.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.datastore:datastore-core-android:1.1.0-beta02")
     val compose_version = "1.7.0-alpha04"
     val nav_version = "2.7.7"
 
@@ -77,7 +81,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
+    //implementation("androidx.compose.material3:material3")
     implementation("com.google.firebase:firebase-database:20.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -86,4 +90,9 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+            implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation("androidx.compose.runtime:runtime-livedata:$compose_version")
+
+
 }

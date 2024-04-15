@@ -36,7 +36,7 @@ fun TermnAndConditionsSceen() {
                     .align(Alignment.TopStart)
                     .padding(10.dp),
                 onClick = { PostOfficeAppRouter.navigateTo(Screen.SignUpScreen) }) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null, tint = Color.White)
             }
         }
         Surface(
