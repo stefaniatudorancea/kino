@@ -274,7 +274,7 @@ fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boole
 }
 
 @Composable
-fun DividerTextComponent() {
+fun DividerTextComponent(text: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -288,7 +288,7 @@ fun DividerTextComponent() {
         )
         Text(
             modifier = Modifier.padding(8.dp),
-            text = stringResource(id = R.string.or),
+            text = text,
             fontSize = 14.sp,
             color = colorResource(id = R.color.colorText)
         )

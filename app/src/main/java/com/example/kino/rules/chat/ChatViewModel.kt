@@ -43,34 +43,7 @@ class ChatViewModel: ViewModel() {
             }
         }
     }
-    fun initiateChatWithDoctor(doctorUid: String) {
-        var patientUid = FirebaseAuth.getInstance().currentUser!!.uid
-        val database = FirebaseDatabase.getInstance().reference
-        val conversationId = generateConversationId(doctorUid, patientUid)
 
-        val conversationsRef = database.child("conversations").child(conversationId)
-
-        conversationsRef.get().addOnSuccessListener { snapshot ->
-            if (!snapshot.exists()) {
-                val conversationData = ChatData(conversationId, patientUid, doctorUid, null)
-                conversationsRef.setValue(conversationData).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Conversația a fost creată cu succes
-                        openChat(conversationId) // O funcție pentru a deschide interfața de chat
-                    } else {
-                        // Tratează eroarea
-                        println("Eroare la crearea conversației.")
-                    }
-                }
-            } else {
-                // Conversația există, deschidem chat-ul
-                openChat(conversationId)
-            }
-        }.addOnFailureListener {
-            // Tratează erorile de ascultare
-            println("Eroare la accesarea bazei de date.")
-        }
-    }
 
     fun sendMessage(chatId: String, senderId: String, messageText: String) {
         val database = FirebaseDatabase.getInstance().reference

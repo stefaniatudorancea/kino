@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kino.data.DOCTOR_NODE
 import com.example.kino.data.USER_NODE
 import com.example.kino.data.UserData
 import com.example.kino.navigation.PostOfficeAppRouter
@@ -43,21 +44,17 @@ class UserViewModel: ViewModel() {
     private fun loadCurrentUser() {
         val uid = auth.currentUser?.uid
         uid?.let {
-            viewModelScope.launch {
-                try {
-                    val document = db.collection(USER_NODE).document(uid).get().await()
-                    val userData = document.toObject(UserData::class.java)
-                    _user.value = userData
-                } catch (e: Exception) {
-                    // Tratează orice excepții care ar putea apărea
-                }
+            db.collection(USER_NODE).document(uid).get().addOnSuccessListener { document ->
+                val userData = document.toObject(UserData::class.java)
+                _user.value = userData
+            }.addOnFailureListener { e ->
+                // Handle the error
             }
         }
     }
 
     fun logout() {
         val fireBaseAuth = FirebaseAuth.getInstance()
-        val nullUri: Uri? = null
         var auth: FirebaseAuth
         auth = Firebase.auth
         val currentUser = auth.currentUser

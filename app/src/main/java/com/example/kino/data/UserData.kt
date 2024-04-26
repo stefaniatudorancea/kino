@@ -7,4 +7,6 @@ data class UserData(
     var email: String = "",
     var imageUrl: String? = "",
     var favDoctor: String? = "false",
-)
+) {
+
+}

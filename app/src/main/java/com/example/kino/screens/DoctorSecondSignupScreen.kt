@@ -123,7 +123,7 @@ fun DoctorSecondSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = view
                     )
 
                 )
-                DividerTextComponent()
+                DividerTextComponent(stringResource(id = R.string.or))
                 ClickableLoginTextComponent(onTextSelected = {
                     PostOfficeAppRouter.navigateTo(Screen.DoctorLoginScreen)
                 })

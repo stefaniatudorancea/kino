@@ -21,15 +21,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kino.R
 import com.example.kino.components.AppToolbar
 import com.example.kino.components.ButtonComponent
+import com.example.kino.components.FavDoctorDialog
 import com.example.kino.components.NavigationAppBar
 import com.example.kino.components.ProfileImage
 import com.example.kino.components.UserDetailsCard
 import com.example.kino.rules.chat.ChatViewModel
 import com.example.kino.rules.doctorList.DoctorsViewModel
+import com.example.kino.rules.doctorProfile.DoctorProfileViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
 
 @Composable
-fun DoctorProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), doctorsViewModel: DoctorsViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel()){
+fun DoctorProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), doctorProfileViewModel: DoctorProfileViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel()){
     Scaffold(
         bottomBar = {
             NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = null)
@@ -51,15 +53,16 @@ fun DoctorProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), 
                 Box(contentAlignment = Alignment.TopCenter,
                     modifier = Modifier.fillMaxSize())
                 {
+                    FavDoctorDialog()
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Spacer(modifier = Modifier.height(20.dp))
-                        ProfileImage(doctorsViewModel.selectedDoctor.value?.imageUrl)
+                        ProfileImage(doctorProfileViewModel.selectedDoctor.value?.imageUrl)
                         Spacer(modifier = Modifier.height(10.dp))
-                        UserDetailsCard(stringResource(id = R.string.name), "${doctorsViewModel.selectedDoctor.value?.lastName} ${doctorsViewModel.selectedDoctor.value?.firstName}")
-                        UserDetailsCard(stringResource(id = R.string.workplace), doctorsViewModel.selectedDoctor.value?.workplace)
-                        UserDetailsCard(stringResource(id = R.string.years_of_experience), doctorsViewModel.selectedDoctor.value?.yearsOfExperience.toString())
-                        UserDetailsCard(stringResource(id = R.string.university), doctorsViewModel.selectedDoctor.value?.university)
-                        UserDetailsCard(stringResource(id = R.string.email), doctorsViewModel.selectedDoctor.value?.email)
+                        UserDetailsCard(stringResource(id = R.string.name), "${doctorProfileViewModel.selectedDoctor.value?.lastName} ${doctorProfileViewModel.selectedDoctor.value?.firstName}")
+                        UserDetailsCard(stringResource(id = R.string.workplace), doctorProfileViewModel.selectedDoctor.value?.workplace)
+                        UserDetailsCard(stringResource(id = R.string.years_of_experience), doctorProfileViewModel.selectedDoctor.value?.yearsOfExperience.toString())
+                        UserDetailsCard(stringResource(id = R.string.university), doctorProfileViewModel.selectedDoctor.value?.university)
+                        UserDetailsCard(stringResource(id = R.string.email), doctorProfileViewModel.selectedDoctor.value?.email)
                         Spacer(modifier = Modifier.height(10.dp))
 //                        ButtonComponent(
 //                            value = stringResource(id = R.string.write_message),
@@ -75,7 +78,7 @@ fun DoctorProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), 
 //                        )
                         ButtonComponent(
                             value = stringResource(id = R.string.try_collab),
-                            onButtonClicked = { chatViewModel.initiateChatWithDoctor(doctorsViewModel.selectedDoctor.value!!.uid) },
+                            onButtonClicked = { doctorProfileViewModel.addFavDoctor() },
                             brush = Brush.horizontalGradient(
                                 listOf(
                                     colorResource(id = R.color.primaryPurple),

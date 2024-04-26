@@ -6,7 +6,6 @@ data class DoctorData(
     var lastName: String = "",
     var email: String = "",
     var imageUrl: String? = "",
-    var isDoctor: Boolean = false,
     var phoneNumber: String = "",
     var yearsOfExperience: Int = 0,
     var workplace: String = "",

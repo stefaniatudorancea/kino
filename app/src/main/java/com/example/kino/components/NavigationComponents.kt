@@ -40,8 +40,6 @@ fun AppToolbar(toolbarTitle: String){
             containerColor = MaterialTheme.colorScheme.primary,
             titleContentColor = MaterialTheme.colorScheme.inversePrimary
         ),
-
-
     )
 }
 
@@ -56,24 +54,26 @@ fun NavigationAppBar(navigationViewModel: NavigationViewModel = viewModel(), pag
             NavigationBarItem(
                 selected = index == pageIndex,
                 onClick = {
-                    PostOfficeAppRouter.navigateTo(item.destination)
+                    item.destination?.let { PostOfficeAppRouter.navigateTo(it) }
                           },
                 icon = {
                     BadgedBox(badge = {
                         if(item.badgeCount != null){
                             Text(text = item.badgeCount.toString())
-                        } else if(item.hasNews){
+                        } else if(item.hasNews == true){
                             Badge()
                         }
                     }) {
-                            Icon(imageVector = if(index == pageIndex) {
-                                item.selectedIcon
-                            } else item.unselectedIcon,
+                        (if(index == pageIndex) {
+                            item.selectedIcon
+                        } else item.unselectedIcon)?.let {
+                            Icon(imageVector = it,
                                 contentDescription = item.titile)
+                        }
                         }
 
                 },
-                label = { androidx.compose.material3.Text(text = item.titile) })
+                label = { item.titile?.let { androidx.compose.material3.Text(text = it) } })
         }
     }
 
@@ -85,6 +85,6 @@ fun NavigationItemRow(item: NavigationItem){
         .padding(all = 16.dp)){
         //Icon(imageVector = item.icon, contentDescription = "")
         Spacer(modifier = Modifier.width(18.dp))
-        NormalTextComponent(value = item.titile)
+        item.titile?.let { NormalTextComponent(value = it) }
     }
 }

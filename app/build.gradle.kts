@@ -91,7 +91,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-            implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation("io.coil-kt:coil-compose:1.4.0")
     implementation("androidx.compose.runtime:runtime-livedata:$compose_version")
 
 

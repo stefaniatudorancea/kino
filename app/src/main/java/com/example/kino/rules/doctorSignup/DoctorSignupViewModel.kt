@@ -8,8 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.kino.data.DOCTOR_NODE
 import com.example.kino.data.DoctorData
-import com.example.kino.data.USER_NODE
-import com.example.kino.data.UserData
 import com.example.kino.data.Validator
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
@@ -17,7 +15,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
-import java.util.LinkedList
 import java.util.UUID
 
 class DoctorSignupViewModel: ViewModel() {
@@ -25,8 +22,8 @@ class DoctorSignupViewModel: ViewModel() {
     var registartionUIState = mutableStateOf(DoctorSignupUIState())
     var firstValidationsPassed = mutableStateOf(false)
     var secondValidationsPassed = mutableStateOf(false)
-    var signUpInProgress = mutableStateOf(false)
-    var currentUid = FirebaseAuth.getInstance().currentUser?.uid
+    private var signUpInProgress = mutableStateOf(false)
+    private var currentUid = FirebaseAuth.getInstance().currentUser?.uid
 
     private val _imageUri = MutableLiveData<Uri?>()
     val imageUri: LiveData<Uri?> = _imageUri
@@ -191,7 +188,7 @@ class DoctorSignupViewModel: ViewModel() {
             secondValidationsPassed.value = false
         }
     }
-    fun uploadImageToFirebaseStorage(imageUri: Uri) {
+    private fun uploadImageToFirebaseStorage(imageUri: Uri) {
         val storageRef = FirebaseStorage.getInstance().reference.child("images/${UUID.randomUUID()}.jpg")
         storageRef.putFile(imageUri).addOnSuccessListener { taskSnapshot ->
             taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
@@ -235,7 +232,6 @@ class DoctorSignupViewModel: ViewModel() {
             lastName = registartionUIState.value.lastName,
             email = registartionUIState.value.email,
             imageUrl = this.imageUrl.value,
-            isDoctor = true,
             phoneNumber = registartionUIState.value.phoneNumber,
             yearsOfExperience = registartionUIState.value.yearsOfExperience,
             workplace = registartionUIState.value.workplace,
@@ -250,7 +246,6 @@ class DoctorSignupViewModel: ViewModel() {
         lastName: String,
         email: String,
         imageUrl: String?,
-        isDoctor: Boolean,
         phoneNumber: String,
         yearsOfExperience: Int,
         workplace: String,
@@ -265,7 +260,6 @@ class DoctorSignupViewModel: ViewModel() {
                 lastName = lastName,
                 email = email,
                 imageUrl = imageUrl,
-                isDoctor = isDoctor,
                 phoneNumber = phoneNumber,
                 yearsOfExperience = yearsOfExperience,
                 workplace = workplace,

@@ -115,7 +115,7 @@ fun DoctorFirstSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = viewM
                     ),
                     imageVector = Icons.Filled.ArrowForward
                 )
-                DividerTextComponent()
+                DividerTextComponent(stringResource(id = R.string.or))
                 ClickableLoginTextComponent(onTextSelected = {
                     PostOfficeAppRouter.navigateTo(Screen.DoctorLoginScreen)
                 })

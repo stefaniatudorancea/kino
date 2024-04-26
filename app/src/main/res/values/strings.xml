@@ -38,4 +38,7 @@
     <string name="your_profile">"Your profile"</string>
     <string name="try_collab">"Try a collaboration"</string>
 
+    <string name="your_physiotherapist">Your physiotherapist</string>
+    <string name="other_physiotherapists">Other physiotherapists</string>
+
 </resources>
