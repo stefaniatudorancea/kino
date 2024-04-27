@@ -51,7 +51,7 @@ fun DoctorsScreen(navigationViewModel: NavigationViewModel = viewModel(), doctor
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            val users by doctorsViewModel.users.observeAsState(initial = emptyList())
+            val users by doctorsViewModel.doctorsList.observeAsState(initial = emptyList())
             val favDoctor by doctorsViewModel.favDoctor.observeAsState()
             LazyColumn {
                 // Adaugă medicul favorit ca un header al listei

@@ -1,7 +1,9 @@
 plugins {
+    id("kotlin-kapt") apply true
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("com.google.dagger.hilt.android") apply true
 }
 
 android {
@@ -57,6 +59,7 @@ dependencies {
     implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.datastore:datastore-core-android:1.1.0-beta02")
+    implementation("com.google.android.datatransport:transport-runtime:3.3.0")
     val compose_version = "1.7.0-alpha04"
     val nav_version = "2.7.7"
 
@@ -94,5 +97,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:1.4.0")
     implementation("androidx.compose.runtime:runtime-livedata:$compose_version")
 
-
+    implementation("com.google.dagger:hilt-android:2.44.2")
+    kapt("com.google.dagger:hilt-android-compiler:2.44.2")
 }
+

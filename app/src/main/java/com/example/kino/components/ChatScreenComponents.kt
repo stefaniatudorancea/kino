@@ -1,5 +1,6 @@
 package com.example.kino.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +27,7 @@ import com.example.kino.R
 import com.example.kino.data.DoctorData
 import com.example.kino.data.Message
 import com.example.kino.rules.chat.ChatViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ChatTextField(
@@ -55,6 +58,32 @@ fun ChatTextField(
         )
     }
 }
+
+@Composable
+fun MessageItem(message: Message) {
+    val isCurrentUser = message.senderId == FirebaseAuth.getInstance().currentUser?.uid
+    // Modificator pentru a alinia mesajele trimise la dreapta și cele primite la stânga
+    val alignment = if (isCurrentUser) Alignment.End else Alignment.Start
+
+    // Crează un rând cu un singur mesaj
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(colorResource(id = R.color.primaryPurple)),
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Text(
+                text = message.text,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+    }
+}
+
 @Composable
 fun ChatCard(chatViewModel: ChatViewModel = viewModel(), user: DoctorData) {
     Card(

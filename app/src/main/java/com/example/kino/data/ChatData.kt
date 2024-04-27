@@ -8,7 +8,7 @@ data class ChatData(
 )
 
 data class Message(
-    val messageId: String = "",
+    var messageId: String = "",
     val senderId: String = "",
     val text: String = "",
     val timestamp: String = "",

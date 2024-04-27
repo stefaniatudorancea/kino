@@ -23,9 +23,6 @@ class DoctorProfileViewModel: ViewModel() {
     private val _selectedDoctor = MutableLiveData<DoctorData?>()
     val selectedDoctor: LiveData<DoctorData?> = _selectedDoctor
 
-    private val _patientUid = MutableLiveData<String?>()
-    val patientUid: LiveData<String?> = _patientUid
-
     private val _showDialog = MutableStateFlow(false)
     val showDialog = _showDialog.asStateFlow()
 
@@ -36,6 +33,8 @@ class DoctorProfileViewModel: ViewModel() {
     fun dismissDialog() {
         _showDialog.value = false
     }
+
+
 
     fun selectDoctor(doctor: DoctorData) {
         _selectedDoctor.value = doctor
@@ -108,7 +107,7 @@ class DoctorProfileViewModel: ViewModel() {
             currentUser.update("currentConversation", conversationId)
                 .addOnSuccessListener {
                     // Aici poți să tratezi cazul în care actualizarea a reușit
-                    Log.d( "UpdateCurrentConversation", "Document successfully updated!")
+                    Log.d( "UpdateCurrentConversation", "Document successfully updatedddd!")
                     selectedDoctor.value?.let { it1 -> initiateChatWithDoctor(it1.uid) }
                 }
                 .addOnFailureListener { e ->

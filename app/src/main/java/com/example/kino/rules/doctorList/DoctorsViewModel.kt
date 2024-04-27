@@ -28,23 +28,17 @@ import kotlinx.coroutines.tasks.await
 
 class DoctorsViewModel: ViewModel() {
 
-    private val _users = MutableLiveData<List<DoctorData>>()
-    val users: LiveData<List<DoctorData>> = _users
+    private val _doctorsList = MutableLiveData<List<DoctorData>>()
+    val doctorsList: LiveData<List<DoctorData>> = _doctorsList
 
     private val _favDoctorUid = MutableLiveData<String?>()
     val favDoctorUid: LiveData<String?> = _favDoctorUid
 
-    private val _favDoctorExist = MutableLiveData<Boolean>(false)
-    val favDoctorExist: LiveData<Boolean> = _favDoctorExist
-
-
     private val _favDoctor = MutableLiveData<DoctorData?>()
     val favDoctor: LiveData<DoctorData?> = _favDoctor
 
-    private val db = FirebaseDatabase.getInstance()
     private val dbb = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
-    private val currentUid = auth.currentUser?.uid
 
     init {
         fetchUsers()
@@ -60,7 +54,7 @@ class DoctorsViewModel: ViewModel() {
                 val userList = snapshot?.documents?.mapNotNull { document ->
                     document.toObject(DoctorData::class.java)
                 } ?: emptyList()
-                _users.value = userList
+                _doctorsList.value = userList
                 Log.d(TAG, "am luat userii")
                 loadFavDoctorUid()
             }
@@ -75,7 +69,6 @@ class DoctorsViewModel: ViewModel() {
                 Log.d(TAG, "am luat uid: ${_favDoctorUid.value}")
                 loadFavDoctor()
             }
-
         }
     }
 
@@ -86,7 +79,6 @@ class DoctorsViewModel: ViewModel() {
                     val userData = document.toObject(DoctorData::class.java)
                     _favDoctor.value = userData // Aici userData este setat în LiveData
                     Log.d(TAG, "am luat mediculȘ ${favDoctor.value?.email}")
-                    _favDoctorExist.value = true
                     removeFavDoctor()
                 }.addOnFailureListener { e ->
                     Log.e("loadCurrentUser", "Error loading user data", e)
@@ -98,10 +90,10 @@ class DoctorsViewModel: ViewModel() {
 
     fun removeFavDoctor() {
         val favDoctor = _favDoctor.value
-        _users.value?.let { users ->
+        _doctorsList.value?.let { users ->
             val mutableUsers = users.toMutableList()
             mutableUsers.removeIf { it == favDoctor }
-            _users.value = mutableUsers
+            _doctorsList.value = mutableUsers
             Log.d(TAG, "am sters medicul")
 
         }
