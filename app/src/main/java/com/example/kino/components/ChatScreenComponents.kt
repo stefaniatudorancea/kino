@@ -1,10 +1,16 @@
 package com.example.kino.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
@@ -13,6 +19,7 @@ import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -33,96 +40,71 @@ import com.google.firebase.auth.FirebaseAuth
 fun ChatTextField(
     onTextSelected: (String) -> Unit,
     onButtonClicked: () -> Unit,
-    errorStatus: Boolean = false,
     isEnabled: Boolean = false
 ){
-    var textValue = remember { mutableStateOf("") }
-    OutlinedTextField(
-        shape = RoundedCornerShape(50),
-        value = textValue.value,
-        onValueChange = {
-            textValue.value = it
-            onTextSelected(it)
-        },
-        singleLine = true,
-        //keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        //singleLine = true,
-        //maxLines = 1,
-        //isError = !errorStatus
-    )
-    IconButton(onClick = { onButtonClicked.invoke(); textValue.value = ""; }, enabled = isEnabled)
-    {
-        Icon(
-            imageVector = Icons.Outlined.Send,
-            contentDescription = "Send Message",
-        )
-    }
-}
-
-@Composable
-fun MessageItem(message: Message) {
-    val isCurrentUser = message.senderId == FirebaseAuth.getInstance().currentUser?.uid
-    // Modificator pentru a alinia mesajele trimise la dreapta și cele primite la stânga
-    val alignment = if (isCurrentUser) Alignment.End else Alignment.Start
-
-    // Crează un rând cu un singur mesaj
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
+            .padding(8.dp), // Adaugă padding pentru a nu lipi componentele de marginile ecranului
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        var textValue = remember { mutableStateOf("") }
+        OutlinedTextField(
+            shape = RoundedCornerShape(50),
+            value = textValue.value,
+            modifier = Modifier
+                .weight(1f)  // Utilizează 'weight' pentru a ocupa tot spațiul disponibil minus butonul
+                .padding(end = 8.dp),
+            onValueChange = {
+                textValue.value = it
+                onTextSelected(it)
+            },
+            singleLine = true,
+        )
+        IconButton(
+            onClick = { onButtonClicked.invoke(); textValue.value = ""; },
+            enabled = isEnabled
+        )
+        {
+            Icon(
+                imageVector = Icons.Outlined.Send,
+                contentDescription = "Send Message",
+            )
+        }
+    }
+}
+
+@Composable
+fun ReceivedMessage(message: Message, currentUser: String) {
+    Box(
+        contentAlignment = if (message.senderId == currentUser) Alignment.CenterEnd else Alignment.CenterStart,
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .fillMaxWidth()
     ) {
         Card(
-            colors = CardDefaults.cardColors(colorResource(id = R.color.primaryPurple)),
-            modifier = Modifier.padding(4.dp)
+            colors = CardDefaults.cardColors(
+                containerColor = if (message.senderId == currentUser) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant
+            ),
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .widthIn(min = 10.dp, max = 300.dp)  // Limităm lățimea cardului între 100.dp și 300.dp
+                .wrapContentHeight()  // Înălțimea se adaptează la conținut
         ) {
             Text(
                 text = message.text,
-                modifier = Modifier.padding(8.dp)
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .background(
+                        color = if (message.senderId == currentUser) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(horizontal = 10.dp, vertical = 6.dp)  // Padding intern pentru text
             )
         }
     }
 }
 
-@Composable
-fun ChatCard(chatViewModel: ChatViewModel = viewModel(), user: DoctorData) {
-    Card(
-        colors = CardDefaults.cardColors(colorResource(id = R.color.primaryPurple)),
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .height(80.dp)
-        //.border(2.dp, RoundedCornerShape(8.dp)), // Portocaliu și colțuri rotunjite
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            ImageForCard(imageUrl = user.imageUrl)
-            androidx.compose.material3.Text(
-                text = "${user.firstName} ${user.firstName}",
-                modifier = Modifier.padding(start = 16.dp),
-                color = Color.White
-            )
-        }
-    }
-}
-@Composable
-fun ReceivedMessage(chatViewModel: ChatViewModel = viewModel(), message: Message){
-    Card(
-        colors = CardDefaults.cardColors(colorResource(id = R.color.primaryPurple)),
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .height(80.dp)
-        //.border(2.dp, RoundedCornerShape(8.dp)), // Portocaliu și colțuri rotunjite
-    ) {
-        Row(
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.padding(8.dp)
-        ) {
 
-        }
-    }
-}
+
 

@@ -16,6 +16,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,9 +28,7 @@ import javax.inject.Inject
 class ChatViewModel: ViewModel() {
     private val TAG = ChatViewModel::class.simpleName
     var chatUIState = mutableStateOf(ChatUIState())
-    //var allValidationsPassed = mutableStateOf(false)
-    var inProcessChats = mutableStateOf(false)
-    val chats = mutableStateOf<List<ChatData>>(listOf())
+
     var currentUser = FirebaseAuth.getInstance().currentUser!!.uid
 
     private val _chatId = MutableLiveData<String?>()
@@ -96,49 +96,82 @@ class ChatViewModel: ViewModel() {
         }
     }
 
-    fun listenForMessages(conversationId: String) {
-        messagesRef = database.child("conversations").child(conversationId).child("messages")
-        if (childEventListener == null) { // Creați listenerul dacă nu a fost deja creat
+    private fun setupMessageListener() {
+        // Înlăturăm vechiul listener, indiferent dacă este sau nu `null`
+        childEventListener?.let { messagesRef?.removeEventListener(it) }
+
+        _currentConversation.value?.let { conversationId ->
+            messagesRef = FirebaseDatabase.getInstance().reference.child("conversations").child(conversationId).child("messages")
+
             childEventListener = object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    val message = snapshot.getValue(Message::class.java)
-                    message?.let {
-                        // Aici actualizează StateFlow-ul cu noul mesaj
-                        val updatedList = _messages.value.toMutableList().apply {
-                            add(it) // adaugă mesajul nou la lista existentă
-                        }
-                        _messages.value = updatedList // emite lista actualizată
+                    snapshot.getValue(Message::class.java)?.let { message ->
+                        val updatedMessages = _messages.value.toMutableList().apply {
+                            add(message)
+                        }.sortedBy { it.timestamp }
+                        _messages.value = updatedMessages
                     }
                 }
 
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onChildRemoved(snapshot: DataSnapshot) {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
-
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+                override fun onChildRemoved(snapshot: DataSnapshot) {}
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
                 override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
+                    Log.e(TAG, "Database error: ${error.toException()}")
                 }
-                // ... alte metode suprascrise dacă este necesar
-            }.also {
-                // Adaugă listener la referință
-                messagesRef.addChildEventListener(it)
             }
+            messagesRef.addChildEventListener(childEventListener as ChildEventListener)
         }
     }
 
+
+    private fun setupRealtimeUpdates() {
+        // Listener pentru mesaje noi sau schimbate
+        childEventListener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                snapshot.getValue(Message::class.java)?.let { message ->
+                    val updatedMessages = _messages.value.toMutableList().apply {
+                        add(message)
+                    }.sortedBy { it.timestamp }
+                    _messages.value = updatedMessages
+                }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val message = snapshot.getValue(Message::class.java)
+                message?.let {
+                    val updatedMessages = _messages.value.toMutableList().apply {
+                        val index = indexOfFirst { it.messageId == it.messageId }
+                        if (index != -1) set(index, it)
+                    }
+                    _messages.value = updatedMessages
+                }
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                snapshot.getValue(Message::class.java)?.let { message ->
+                    val updatedMessages = _messages.value.toMutableList().apply {
+                        removeAll { it.messageId == message.messageId }
+                    }
+                    _messages.value = updatedMessages
+                }
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Database error: ${error.toException()}")
+            }
+        }
+        messagesRef.addChildEventListener(childEventListener as ChildEventListener)
+    }
+
+
+
     override fun onCleared() {
         super.onCleared()
-        childEventListener?.let { listener ->
-            messagesRef.removeEventListener(listener)
-        }
+        // Îndepărtăm listener-ul atunci când ViewModel-ul este distrus
+        messagesRef?.removeEventListener(childEventListener!!)
     }
 
     private fun updateMessageList(message: Message){
@@ -153,6 +186,7 @@ class ChatViewModel: ViewModel() {
             FirebaseFirestore.getInstance().collection(USER_NODE).document(uid).get().addOnSuccessListener { document ->
                 _currentConversation.value = document.getString("currentConversation")
                 Log.d(ContentValues.TAG, "conversatia curenta: ${_currentConversation.value}")
+                setupMessageListener()
             }
         }
     }

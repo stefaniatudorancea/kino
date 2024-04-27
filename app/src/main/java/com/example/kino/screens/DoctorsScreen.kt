@@ -30,10 +30,10 @@ import com.example.kino.rules.navigation.NavigationViewModel
 
 @Composable
 fun DoctorsScreen(navigationViewModel: NavigationViewModel = viewModel(), doctorsViewModel: DoctorsViewModel = viewModel()) {
-    LaunchedEffect(Unit) {
-        // Acest apel va reîmprospăta datele ori de câte ori intri pe acest ecran
-        doctorsViewModel.fetchUsers()
-    }
+//    LaunchedEffect(Unit) {
+//        // Acest apel va reîmprospăta datele ori de câte ori intri pe acest ecran
+//        doctorsViewModel.fetchUsers()
+//    }
     Scaffold(
         bottomBar = {
             NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = navigationViewModel.navigationItemsList[0].index)

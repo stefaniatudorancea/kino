@@ -8,8 +8,11 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.kino.app.EventBus
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
+import kotlinx.coroutines.launch
 
 class NavigationViewModel: ViewModel() {
     val navigationItemsList = listOf<NavigationItem>(
@@ -54,6 +57,9 @@ class NavigationViewModel: ViewModel() {
                 PostOfficeAppRouter.navigateTo(Screen.RoutineScreen)
             }
             is NavigationUIEvent.ProfileButtonClicked -> {
+                viewModelScope.launch {
+                    EventBus.postEvent("TriggerAction")
+                }
                 PostOfficeAppRouter.navigateTo(Screen.ProfileScreen)
             }
 

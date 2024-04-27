@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kino.app.EventBus
 import com.example.kino.data.DOCTOR_NODE
 import com.example.kino.data.DoctorData
 import com.example.kino.data.USER_NODE
@@ -42,6 +43,13 @@ class DoctorsViewModel: ViewModel() {
 
     init {
         fetchUsers()
+        viewModelScope.launch {
+            EventBus.events.collect { event ->
+                if (event == "TriggerAction") {
+                    fetchUsers()
+                }
+            }
+        }
     }
 
     fun fetchUsers() {
