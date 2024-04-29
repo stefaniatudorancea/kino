@@ -8,18 +8,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
-import com.example.kino.screens.ChatsScreen
-import com.example.kino.screens.DoctorLoginScreen
-import com.example.kino.screens.DoctorFirstSignupScreen
-import com.example.kino.screens.DoctorProfileScreen
-import com.example.kino.screens.DoctorSecondSignupScreen
-import com.example.kino.screens.DoctorsScreen
-import com.example.kino.screens.HomeScreen
-import com.example.kino.screens.LoginScreen
-import com.example.kino.screens.ProfileScreen
-import com.example.kino.screens.RoutineScreen
-import com.example.kino.screens.SignUpScreen
-import com.example.kino.screens.TermnAndConditionsSceen
+import com.example.kino.screens.patientScreens.ChatsScreen
+import com.example.kino.screens.doctorScreens.DoctorLoginScreen
+import com.example.kino.screens.doctorScreens.DoctorFirstSignupScreen
+import com.example.kino.screens.patientScreens.DoctorProfileScreen
+import com.example.kino.screens.doctorScreens.DoctorSecondSignupScreen
+import com.example.kino.screens.patientScreens.DoctorsScreen
+import com.example.kino.screens.patientScreens.HomeScreen
+import com.example.kino.screens.patientScreens.LoginScreen
+import com.example.kino.screens.patientScreens.ProfileScreen
+import com.example.kino.screens.patientScreens.RoutineScreen
+import com.example.kino.screens.patientScreens.SignUpScreen
+import com.example.kino.screens.patientScreens.TermnAndConditionsSceen
 
 @Composable
 fun PostOfficeApp(){

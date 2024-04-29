@@ -1,4 +1,4 @@
-package com.example.kino.screens
+package com.example.kino.screens.doctorScreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

@@ -17,6 +17,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -24,8 +27,12 @@ class UserViewModel: ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    private val _user = MutableLiveData<UserData?>()
-    val user: LiveData<UserData?> = _user
+    private val _user = MutableStateFlow<UserData?>(null)
+    val user: StateFlow<UserData?> = _user.asStateFlow()
+
+
+    private lateinit var authStateListener: FirebaseAuth.AuthStateListener
+
 
     init {
         loadCurrentUser()
@@ -42,32 +49,46 @@ class UserViewModel: ViewModel() {
 
     // Încărcarea datelor utilizatorului logat
     private fun loadCurrentUser() {
-        val uid = auth.currentUser?.uid
-        uid?.let {
-            db.collection(USER_NODE).document(uid).get().addOnSuccessListener { document ->
-                val userData = document.toObject(UserData::class.java)
-                _user.value = userData
-            }.addOnFailureListener { e ->
-                // Handle the error
+        viewModelScope.launch {
+            val uid = auth.currentUser?.uid
+            uid?.let {
+                try {
+                    val document = db.collection(USER_NODE).document(uid).get().await()
+                    val userData = document.toObject(UserData::class.java)
+                    _user.value = userData  // Actualizăm StateFlow
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to load user data: $e")
+                    // Opțional: poți actualiza StateFlow cu null sau o valoare de eroare specifică
+                    _user.value = null
+                }
             }
         }
     }
 
+
     fun logout() {
-        val fireBaseAuth = FirebaseAuth.getInstance()
-        var auth: FirebaseAuth
-        auth = Firebase.auth
-        val currentUser = auth.currentUser
-        fireBaseAuth.signOut()
-        Log.d(TAG, "current: $currentUser")
-        val authStateListener = FirebaseAuth.AuthStateListener {
-            if (it.currentUser == null) {
-                Log.d(TAG, "Inside sign out success")
+        val firebaseAuth = FirebaseAuth.getInstance()
+
+        // Definirea listenerului ca variabilă locală.
+        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuthInstance ->
+            if (firebaseAuthInstance.currentUser == null) {
+                Log.d(TAG, "User successfully signed out")
+                // Navighează către ecranul de login după ce te-ai asigurat că sign out a avut succes
                 PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
+                // Elimină listenerul după ce a fost folosit
+                firebaseAuth.removeAuthStateListener(authStateListener)
             } else {
-                Log.d(TAG, "Inside sign out is not complete")
+                Log.d(TAG, "Sign out is not complete")
             }
         }
-        fireBaseAuth.addAuthStateListener(authStateListener)
+
+        // Adaugă listenerul înainte de a apela signOut pentru a capta schimbarea de stare
+        firebaseAuth.addAuthStateListener(authStateListener)
+        // Apelarea metodei signOut pentru a deconecta utilizatorul
+        firebaseAuth.signOut()
     }
+
+
+
+
 }

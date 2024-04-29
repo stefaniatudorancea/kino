@@ -5,8 +5,10 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.SportsGymnastics
 import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.SportsGymnastics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kino.app.EventBus
@@ -45,6 +47,36 @@ class NavigationViewModel: ViewModel() {
         ),
     )
 
+    val navigationItemsListD = listOf<NavigationItem>(
+        NavigationItem(
+            index = 0,
+            titile = "Patients",
+            selectedIcon = Icons.Filled.People,
+            unselectedIcon = Icons.Outlined.People,
+            hasNews = false,
+            badgeCount = null,
+            destination = Screen.DoctorsScreen
+        ),
+        NavigationItem(
+            index = 1,
+            titile = "Routines",
+            selectedIcon = Icons.Filled.SportsGymnastics,
+            unselectedIcon = Icons.Outlined.SportsGymnastics,
+            hasNews = false,
+            badgeCount = null,
+            destination = Screen.ChatsScreen
+        ),
+        NavigationItem(
+            index = 2,
+            titile = "Profile",
+            selectedIcon = Icons.Filled.Person,
+            unselectedIcon = Icons.Outlined.Person,
+            hasNews = false,
+            badgeCount = null,
+            destination = Screen.ProfileScreen
+        ),
+    )
+
     fun onEvent(event: NavigationUIEvent) {
         when (event) {
             is NavigationUIEvent.HomeButtonClicked -> {
@@ -57,9 +89,9 @@ class NavigationViewModel: ViewModel() {
                 PostOfficeAppRouter.navigateTo(Screen.RoutineScreen)
             }
             is NavigationUIEvent.ProfileButtonClicked -> {
-                viewModelScope.launch {
-                    EventBus.postEvent("TriggerAction")
-                }
+//                viewModelScope.launch {
+//                    EventBus.postEvent("TriggerAction")
+//                }
                 PostOfficeAppRouter.navigateTo(Screen.ProfileScreen)
             }
 

@@ -1,18 +1,14 @@
-package com.example.kino.screens
+package com.example.kino.screens.patientScreens
 
 import com.example.kino.rules.doctorList.DoctorsViewModel
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -24,7 +20,6 @@ import com.example.kino.R
 import com.example.kino.components.AppToolbar
 import com.example.kino.components.DividerTextComponent
 import com.example.kino.components.DoctorCard
-import com.example.kino.components.FavDoctorCard
 import com.example.kino.components.NavigationAppBar
 import com.example.kino.rules.navigation.NavigationViewModel
 

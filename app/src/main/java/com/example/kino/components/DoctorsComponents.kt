@@ -35,6 +35,7 @@ import coil.compose.rememberImagePainter
 import com.example.kino.R
 import com.example.kino.data.DoctorData
 import com.example.kino.rules.doctorList.DoctorsViewModel
+import com.example.kino.rules.doctorProfile.DoctorProfileUIEvent
 import com.example.kino.rules.doctorProfile.DoctorProfileViewModel
 
 @Composable
@@ -126,7 +127,7 @@ fun FavDoctorDialog(doctorViewModel: DoctorProfileViewModel = viewModel()) {
             title = { Text("Confirmare schimbare") },
             text = { Text("Doriți să schimbați medicul favorit actual?") },
             confirmButton = {
-                Button(onClick = { doctorViewModel.assignFavDoctor() }) {
+                Button(onClick = { doctorViewModel.onEvent(DoctorProfileUIEvent.ConfirmDialogButtonClicked) }) {
                     Text("Da")
                 }
             },

@@ -1,4 +1,4 @@
-package com.example.kino.screens
+package com.example.kino.screens.doctorScreens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -38,7 +37,6 @@ import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.example.kino.rules.doctorSignup.DoctorSignupUIEvent
 import com.example.kino.rules.doctorSignup.DoctorSignupViewModel
-import com.example.kino.rules.signup.SignupUIEvent
 
 @Composable
 fun DoctorFirstSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = viewModel()){

@@ -1,4 +1,4 @@
-package com.example.kino.screens
+package com.example.kino.screens.patientScreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kino.R
@@ -27,14 +28,14 @@ import com.example.kino.components.HeadingTextComponent
 import com.example.kino.components.MyTextFieldComponent
 import com.example.kino.components.PasswordTextFieldComponent
 import com.example.kino.components.UnderLinedTextComponent
-import com.example.kino.navigation.PostOfficeAppRouter
-import com.example.kino.navigation.Screen
-import com.example.kino.rules.doctorLogin.DoctorLoginUIEvent
-import com.example.kino.rules.doctorLogin.DoctorLoginViewModel
 import com.example.kino.rules.login.LoginUIEvent
 import com.example.kino.rules.login.LoginViewModel
+import com.example.kino.navigation.PostOfficeAppRouter
+import com.example.kino.navigation.Screen
+
 @Composable
-fun DoctorLoginScreen(doctorLoginViewModel: DoctorLoginViewModel = viewModel()) {
+fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -53,14 +54,14 @@ fun DoctorLoginScreen(doctorLoginViewModel: DoctorLoginViewModel = viewModel()) 
                 MyTextFieldComponent(
                     labelValue = stringResource(id = R.string.email),
                     painterResource = painterResource(id = R.drawable.envelope),
-                    onTextSelected = {doctorLoginViewModel.onEvent(DoctorLoginUIEvent.EmailChanged(it))},
-                    errorStatus = doctorLoginViewModel.loginUIState.value.emailError
+                    onTextSelected = {loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))},
+                    errorStatus = loginViewModel.loginUIState.value.emailError
                 )
                 PasswordTextFieldComponent(
                     labelValue = stringResource(id = R.string.password),
                     painterResource = painterResource(id = R.drawable.lock),
-                    onTextSelected = {doctorLoginViewModel.onEvent(DoctorLoginUIEvent.PasswordChanged(it))},
-                    errorStatus = doctorLoginViewModel.loginUIState.value.passwordError
+                    onTextSelected = {loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))},
+                    errorStatus = loginViewModel.loginUIState.value.passwordError
                 )
                 Spacer(modifier = Modifier.height(40.dp))
                 UnderLinedTextComponent(value = stringResource(id = R.string.forgot_password))
@@ -68,32 +69,11 @@ fun DoctorLoginScreen(doctorLoginViewModel: DoctorLoginViewModel = viewModel()) 
                 ButtonComponent(
                     value = stringResource(id = R.string.login),
                     onButtonClicked = {
-                        doctorLoginViewModel.onEvent(
-                            DoctorLoginUIEvent.LoginButtonClicked
+                        loginViewModel.onEvent(
+                            LoginUIEvent.LoginButtonClicked
                         )
                     },
-                    isEnabled = doctorLoginViewModel.allValidationsPassed.value,
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            colorResource(id = R.color.primaryBlue),
-                            colorResource(id = R.color.secondaryBlue),
-                        )
-                    ),
-                    imageVector = null
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                DividerTextComponent(stringResource(id = R.string.or))
-                ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
-                    PostOfficeAppRouter.navigateTo(Screen.DoctorFirstSignupScreen)
-                })
-                Spacer(modifier = Modifier.height(165.dp))
-
-                ButtonComponent(
-                    value = stringResource(id = R.string.im_patient),
-                    onButtonClicked = {
-                        doctorLoginViewModel.onEvent(DoctorLoginUIEvent.PatientButtonClicked)
-                    },
-                    isEnabled = true,
+                    isEnabled = loginViewModel.allValidationsPassed.value,
                     brush = Brush.horizontalGradient(
                         listOf(
                             colorResource(id = R.color.primaryPurple),
@@ -102,13 +82,39 @@ fun DoctorLoginScreen(doctorLoginViewModel: DoctorLoginViewModel = viewModel()) 
                     ),
                     imageVector = null
                 )
+                Spacer(modifier = Modifier.height(20.dp))
+                DividerTextComponent(stringResource(id = R.string.or))
+                ClickableLoginTextComponent(tryingToLogin = false, onTextSelected = {
+                    PostOfficeAppRouter.navigateTo(Screen.SignUpScreen)
+                })
+                Spacer(modifier = Modifier.height(165.dp))
+                ButtonComponent(
+                    value = stringResource(id = R.string.im_physiotherapist),
+                    onButtonClicked = {
+                        loginViewModel.onEvent(LoginUIEvent.PhysioteraphistButtonClicked)
+                    },
+                    isEnabled = true,
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            colorResource(id = R.color.primaryBlue),
+                            colorResource(id = R.color.secondaryBlue),
+                        )
+                    ),
+                    imageVector = null
+                )
             }
         }
 
-        if(doctorLoginViewModel.loginInProcess.value){
+        if(loginViewModel.loginInProcess.value){
             CircularProgressIndicator()
         }
 
     }
 
+}
+
+@Preview
+@Composable
+fun LoginScreenPreview() {
+    //LoginScreen()
 }

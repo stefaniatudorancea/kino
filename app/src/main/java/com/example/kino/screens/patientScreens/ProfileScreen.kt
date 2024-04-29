@@ -1,4 +1,4 @@
-package com.example.kino.screens
+package com.example.kino.screens.patientScreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -7,10 +7,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -31,13 +32,14 @@ import com.example.kino.rules.user.UserViewModel
 
 @Composable
 fun ProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), userViewModel: UserViewModel = viewModel()){
+    val user by userViewModel.user.collectAsState()
     Scaffold(
         bottomBar = {
             NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = null)
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.doctor_profile)
+                toolbarTitle = stringResource(id = R.string.my_profile)
             )
         },
     ){
@@ -54,10 +56,10 @@ fun ProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), userVi
             {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Spacer(modifier = Modifier.height(20.dp))
-                    ProfileImage(userViewModel.user.value?.imageUrl)
+                    ProfileImage(user?.imageUrl)
                     Spacer(modifier = Modifier.height(10.dp))
-                    UserDetailsCard(stringResource(id = R.string.name), "${userViewModel.user.value?.lastName} ${userViewModel.user.value?.firstName}")
-                    UserDetailsCard(stringResource(id = R.string.email), userViewModel.user.value?.email)
+                    UserDetailsCard(stringResource(id = R.string.name), "${user?.lastName} ${user?.firstName}")
+                    UserDetailsCard(stringResource(id = R.string.email), user?.email)
                     ButtonComponent(
                         value = stringResource(id = R.string.logout),
                         onButtonClicked = { userViewModel.onEvent(UserUIEvent.LogoutButtonClicked) },

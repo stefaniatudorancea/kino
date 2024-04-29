@@ -1,19 +1,28 @@
 package com.example.kino.rules.doctorProfile
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.kino.app.EventBus
 import com.example.kino.data.ChatData
+import com.example.kino.data.DOCTOR_NODE
 import com.example.kino.data.DoctorData
 import com.example.kino.data.USER_NODE
+import com.example.kino.data.UserData
+import com.example.kino.data.UserDataForDoctorList
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
+import com.example.kino.rules.chat.ChatUIEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.security.MessageDigest
 
 class DoctorProfileViewModel: ViewModel() {
@@ -23,8 +32,33 @@ class DoctorProfileViewModel: ViewModel() {
     private val _selectedDoctor = MutableLiveData<DoctorData?>()
     val selectedDoctor: LiveData<DoctorData?> = _selectedDoctor
 
+    private val _currentUser = MutableLiveData<UserData?>()
+    val currentUser: LiveData<UserData?> = _currentUser
+
+    private val _currentUserForDoctorList = MutableLiveData<UserDataForDoctorList?>()
+    val currentUserForDoctorList: LiveData<UserDataForDoctorList?> = _currentUserForDoctorList
+
+
     private val _showDialog = MutableStateFlow(false)
     val showDialog = _showDialog.asStateFlow()
+
+    fun onEvent(event: DoctorProfileUIEvent){
+        when(event){
+            is DoctorProfileUIEvent.ConfirmDialogButtonClicked -> {
+                dismissDialog()
+                removeFromPatientList()
+                viewModelScope.launch {
+                    EventBus.postEvent("TriggerAction")
+                }
+                PostOfficeAppRouter.navigateTo(Screen.DoctorsScreen)
+            }
+        }
+    }
+
+
+    init{
+        loadCurrentUser()
+    }
 
     fun showConfirmationDialog() {
         _showDialog.value = true
@@ -33,8 +67,6 @@ class DoctorProfileViewModel: ViewModel() {
     fun dismissDialog() {
         _showDialog.value = false
     }
-
-
 
     fun selectDoctor(doctor: DoctorData) {
         _selectedDoctor.value = doctor
@@ -49,6 +81,7 @@ class DoctorProfileViewModel: ViewModel() {
                 .addOnSuccessListener {
                     // Aici poți să tratezi cazul în care actualizarea a reușit
                     Log.d( "UpdateDoc", "Document successfully updated!")
+                    addPatientToDoctorList()
                     selectedDoctor.value?.let { it1 -> initiateChatWithDoctor(it1.uid) }
                 }
                 .addOnFailureListener { e ->
@@ -56,8 +89,37 @@ class DoctorProfileViewModel: ViewModel() {
                     Log.w("UpdateDoc", "Error updating document", e)
                 }
         }
-        dismissDialog()
     }
+
+    fun removeFromPatientList() {
+        val selectedDoctor = currentUser.value?.let { it.favDoctor?.let { it1 ->
+            db.collection(DOCTOR_NODE).document(
+                it1
+            )
+        } }
+        if (selectedDoctor != null) {
+            // Utilizează FieldValue.arrayRemove pentru a elimina currentUser din array-ul patientsList
+            selectedDoctor.update("patientsList", FieldValue.arrayRemove(currentUserForDoctorList))
+                .addOnSuccessListener {
+                    Log.d(TAG, "Patient successfully removed from patientsList")
+                    assignFavDoctor()
+                }
+                .addOnFailureListener {
+                    e -> Log.w(TAG, "Error removing patient from patientsList", e)
+                }
+        }
+    }
+
+    fun addPatientToDoctorList() {
+        val selectedDoctor = selectedDoctor.value?.let { db.collection(DOCTOR_NODE).document(it.uid) }
+        if (selectedDoctor != null) {
+            // Utilizează FieldValue.arrayUnion pentru a adăuga noul pacient în array-ul patientsList
+            selectedDoctor.update("patientsList", FieldValue.arrayUnion(currentUserForDoctorList))
+                .addOnSuccessListener { Log.d(TAG, "Patient successfully added to patientsList") }
+                .addOnFailureListener { e -> Log.w(TAG, "Error adding patient to patientsList", e) }
+        }
+    }
+
 
     fun generateConversationId(patientUid: String, doctorUid: String): String {
         val combinedId = if (doctorUid > patientUid) "$doctorUid-$patientUid" else "$patientUid-$doctorUid"
@@ -115,7 +177,21 @@ class DoctorProfileViewModel: ViewModel() {
                     Log.w("UpdateCurrentConversation", "Error updating document", e)
                 }
         }
-        dismissDialog()
+
+    }
+
+    private fun loadCurrentUser() {
+        val uid = auth.currentUser?.uid
+        uid?.let {
+            db.collection(USER_NODE).document(uid).get().addOnSuccessListener { document ->
+                val userData = document.toObject(UserData::class.java)
+                _currentUser.value = userData
+                val userDataForDoctorList = document.toObject(UserDataForDoctorList::class.java)
+                _currentUserForDoctorList.value = userDataForDoctorList
+            }.addOnFailureListener { e ->
+                // Handle the error
+            }
+        }
     }
 
     fun addFavDoctor() {
@@ -126,6 +202,7 @@ class DoctorProfileViewModel: ViewModel() {
                 val currentValue = document.getString("favDoctor")
                 if (currentValue == "") {
                     assignFavDoctor()
+                    //removeFromPatientList()
                 } else {
                     showConfirmationDialog()
                 }

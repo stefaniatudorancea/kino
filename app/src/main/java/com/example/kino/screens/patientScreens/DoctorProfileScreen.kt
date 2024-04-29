@@ -1,4 +1,4 @@
-package com.example.kino.screens
+package com.example.kino.screens.patientScreens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,7 +26,6 @@ import com.example.kino.components.NavigationAppBar
 import com.example.kino.components.ProfileImage
 import com.example.kino.components.UserDetailsCard
 import com.example.kino.rules.chat.ChatViewModel
-import com.example.kino.rules.doctorList.DoctorsViewModel
 import com.example.kino.rules.doctorProfile.DoctorProfileViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
 

@@ -1,11 +1,8 @@
-package com.example.kino.screens
+package com.example.kino.screens.patientScreens
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,14 +16,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,8 +26,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kino.R
 import com.example.kino.components.AppToolbar
 import com.example.kino.components.ChatTextField
-import com.example.kino.components.DividerTextComponent
-import com.example.kino.components.DoctorCard
 import com.example.kino.components.NavigationAppBar
 import com.example.kino.components.ReceivedMessage
 import com.example.kino.rules.chat.ChatUIEvent

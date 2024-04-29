@@ -19,4 +19,6 @@
 
     <color name="primaryBlue">#197868</color>
     <color name="secondaryBlue">#209985</color>
+
+    <color name="toolbarBlue">#6C89BA</color>
 </resources>

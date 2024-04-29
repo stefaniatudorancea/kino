@@ -31,13 +31,13 @@ import com.example.kino.navigation.PostOfficeAppRouter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppToolbar(toolbarTitle: String){
+fun AppToolbarD(toolbarTitle: String){
     TopAppBar(
         title = {
             Text(text = toolbarTitle, color = colorResource(id = R.color.white))
-                },
+        },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = colorResource(id = R.color.toolbarBlue),
             titleContentColor = MaterialTheme.colorScheme.inversePrimary
         ),
     )
@@ -45,7 +45,7 @@ fun AppToolbar(toolbarTitle: String){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationAppBar(navigationViewModel: NavigationViewModel = viewModel(), pageIndex: Int?){
+fun NavigationAppBarD(navigationViewModel: NavigationViewModel = viewModel(), pageIndex: Int?){
     var selectedItemIndex by rememberSaveable {
         mutableStateOf(0)
     }
@@ -55,7 +55,7 @@ fun NavigationAppBar(navigationViewModel: NavigationViewModel = viewModel(), pag
                 selected = index == pageIndex,
                 onClick = {
                     item.destination?.let { PostOfficeAppRouter.navigateTo(it) }
-                          },
+                },
                 icon = {
                     BadgedBox(badge = {
                         if(item.badgeCount != null){
@@ -70,11 +70,10 @@ fun NavigationAppBar(navigationViewModel: NavigationViewModel = viewModel(), pag
                             Icon(imageVector = it,
                                 contentDescription = item.titile)
                         }
-                        }
+                    }
 
                 },
                 label = { item.titile?.let { androidx.compose.material3.Text(text = it) } })
         }
     }
-
 }
