@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -60,23 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.example.kino.R
-
-@Composable
-fun NormalTextComponent(value: String) {
-    Text(
-        text = value,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 40.dp),
-        style = TextStyle(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Normal,
-            fontStyle = FontStyle.Normal
-        ),
-        color = colorResource(id = R.color.colorText),
-        textAlign = TextAlign.Center
-    )
-}
+import com.example.kino.navigation.PostOfficeAppRouter
 
 @Composable
 fun HeadingTextComponent(value: String) {
@@ -131,7 +116,6 @@ fun MyTextFieldComponent(
             }
         },
         isError = !errorStatus,
-
     )
 }
 
@@ -148,15 +132,8 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onT
         label = { Text(text = labelValue) },
         onValueChange = { password.value = it
                         onTextSelected(it)},
-//        keyboardOptions = KeyboardOptions(
-//            keyboardType = KeyboardType.Password,
-//            imeAction = ImeAction.Done
-//        ),
         singleLine = true,
         maxLines = 1,
-//        keyboardActions = KeyboardActions {
-//            localFocusManager.clearFocus()
-//        },
         leadingIcon = {
             Icon(
                 modifier = Modifier.height(10.dp),
@@ -171,12 +148,10 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onT
             } else {
                 Icons.Filled.VisibilityOff
             }
-
             IconButton(onClick = { passwordVisibile.value = !passwordVisibile.value }) {
                 Icon(imageVector = iconImage, contentDescription = null)
             }
         },
-
         visualTransformation = if (passwordVisibile.value) VisualTransformation.None else PasswordVisualTransformation(),
         isError = !errorStatus
     )
@@ -268,7 +243,6 @@ fun ButtonComponent(value: String, onButtonClicked: () -> Unit, isEnabled: Boole
                     Icon(imageVector = imageVector, contentDescription = "Next page", tint = Color.White)
                 }
             }
-
         }
     }
 }
@@ -304,8 +278,6 @@ fun DividerTextComponent(text: String) {
 
 @Composable
 fun ClickableLoginTextComponent(tryingToLogin: Boolean = true, onTextSelected: (String) -> Unit) {
-
-
     val initialText =
         if (tryingToLogin) "Already have an accout? " else "Don't have an account yet? "
     val loginText = if (tryingToLogin) "Login" else "Register"
@@ -316,7 +288,6 @@ fun ClickableLoginTextComponent(tryingToLogin: Boolean = true, onTextSelected: (
             append(loginText)
         }
     }
-
     ClickableText(
         modifier = Modifier
             .fillMaxWidth()
@@ -362,7 +333,6 @@ fun ImageViewer(imageUri: Uri?, imageUrl: String?, onButtonClicked: () -> Unit) 
     val painter = if (imageUrl != null) rememberImagePainter(imageUrl)
     else if (imageUri != null) rememberImagePainter(imageUri)
     else painterResource(id = R.drawable.default_profile)
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -381,25 +351,12 @@ fun ImageViewer(imageUri: Uri?, imageUrl: String?, onButtonClicked: () -> Unit) 
     }
 }
 
-
-//@Composable
-//fun ImageViewer(imageUri: Uri?, imageUrl: String?, onButtonClicked: () -> Unit) {
-//    val painter = if (imageUrl != null) rememberImagePainter(imageUrl) else if (imageUri != null) rememberImagePainter(imageUri) else painterResource(id = R.drawable.default_profile)
-//
-//    Image(
-//        painter = painter,
-//        contentDescription = "Profile Image",
-//        modifier = Modifier
-//            .size(120.dp)
-//            .clip(CircleShape)
-//            .border(2.dp, Color.Gray, CircleShape),
-//        contentScale = ContentScale.Crop
-//
-//    )
-//}
-
-
-
-
-
-
+@Composable
+fun BackButton() {
+    IconButton(onClick = { PostOfficeAppRouter.goBack() }) {
+        Icon(
+            imageVector = Icons.Filled.ArrowBack,
+            contentDescription = "Back"
+        )
+    }
+}

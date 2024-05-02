@@ -33,11 +33,12 @@ import com.example.kino.rules.navigation.NavigationViewModel
 fun DoctorProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), doctorProfileViewModel: DoctorProfileViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel()){
     Scaffold(
         bottomBar = {
-            NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = null)
+            NavigationAppBar(navigationItems = navigationViewModel.navigationItemsList, pageIndex = null)
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.doctor_profile)
+                toolbarTitle = stringResource(id = R.string.doctor_profile),
+                isDoctor = false
             )
         },
     ){

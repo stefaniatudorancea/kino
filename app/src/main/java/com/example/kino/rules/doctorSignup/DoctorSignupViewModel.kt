@@ -214,34 +214,40 @@ class DoctorSignupViewModel: ViewModel() {
     private fun createUserInFirebase(email: String, password: String) {
         signUpInProgress.value = true
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                Log.d(TAG,"Insider_OnCompleteListener")
-                Log.d(TAG,"isSuccessful = ${it.isSuccessful}, ${email}, ${password}")
+            .addOnCompleteListener { task ->
                 signUpInProgress.value = false
-                if(it.isSuccessful){
-                    PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
+                if (task.isSuccessful) {
+                    // Acum că utilizatorul este creat, obține uid-ul acestuia.
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    currentUser?.let { user ->
+                        // Apoi adaugă detaliile utilizatorului în Firestore.
+                        addUserDetailsInDatabase(
+                            uid = user.uid,
+                            firstName = registartionUIState.value.firstName,
+                            lastName = registartionUIState.value.lastName,
+                            email = registartionUIState.value.email,
+                            imageUrl = this.imageUrl.value,
+                            phoneNumber = registartionUIState.value.phoneNumber,
+                            yearsOfExperience = registartionUIState.value.yearsOfExperience,
+                            workplace = registartionUIState.value.workplace,
+                            university = registartionUIState.value.university,
+                            graduationYear = registartionUIState.value.graduationYear,
+                            linkedln = registartionUIState.value.linkedln
+                        )
+                    }
+                    PostOfficeAppRouter.navigateTo(Screen.PatientsListScreen)
+                } else {
+                    Log.d(TAG,"User registration failed: ${task.exception}")
                 }
             }
-            .addOnFailureListener {
-                Log.d(TAG,"Inside_OnFailureListener")
-                Log.d(TAG,"Exception = ${it.message}")
-                Log.d(TAG,"Exception = ${it.localizedMessage}")
+            .addOnFailureListener { exception ->
+                signUpInProgress.value = false
+                Log.d(TAG,"User registration failed: ${exception.localizedMessage}")
             }
-        addUserDetailsInDatabase(
-            firstName = registartionUIState.value.firstName,
-            lastName = registartionUIState.value.lastName,
-            email = registartionUIState.value.email,
-            imageUrl = this.imageUrl.value,
-            phoneNumber = registartionUIState.value.phoneNumber,
-            yearsOfExperience = registartionUIState.value.yearsOfExperience,
-            workplace = registartionUIState.value.workplace,
-            university = registartionUIState.value.university,
-            graduationYear = registartionUIState.value.graduationYear,
-            linkedln = registartionUIState.value.linkedln
-        )
     }
 
     private fun addUserDetailsInDatabase(
+        uid: String,
         firstName: String,
         lastName: String,
         email: String,
@@ -253,28 +259,25 @@ class DoctorSignupViewModel: ViewModel() {
         graduationYear: Int,
         linkedln: String
     ) {
-        val doctorData = currentUid?.let {
-            DoctorData(
-                uid = it,
-                firstName = firstName,
-                lastName = lastName,
-                email = email,
-                imageUrl = imageUrl,
-                phoneNumber = phoneNumber,
-                yearsOfExperience = yearsOfExperience,
-                workplace = workplace,
-                university = university,
-                graduationYear = graduationYear,
-                linkedln = linkedln
-            )
-        }
+        val doctorData = DoctorData(
+            uid = uid,
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            imageUrl = imageUrl,
+            phoneNumber = phoneNumber,
+            yearsOfExperience = yearsOfExperience,
+            workplace = workplace,
+            university = university,
+            graduationYear = graduationYear,
+            linkedln = linkedln
+        )
 
         val db = Firebase.firestore
-        if (doctorData != null) {
-            db.collection(DOCTOR_NODE).document(doctorData.uid)
-                .set(doctorData)
-        }
-
-
+        db.collection(DOCTOR_NODE).document(uid)
+            .set(doctorData)
+            .addOnSuccessListener { Log.d(TAG, "User details added to database") }
+            .addOnFailureListener { e -> Log.d(TAG, "Error adding user details", e) }
     }
+
 }

@@ -82,6 +82,9 @@ class DoctorProfileViewModel: ViewModel() {
                     // Aici poți să tratezi cazul în care actualizarea a reușit
                     Log.d( "UpdateDoc", "Document successfully updated!")
                     addPatientToDoctorList()
+                    viewModelScope.launch {
+                        EventBus.postEvent("UpdateConversationId")
+                    }
                     selectedDoctor.value?.let { it1 -> initiateChatWithDoctor(it1.uid) }
                 }
                 .addOnFailureListener { e ->

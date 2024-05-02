@@ -21,4 +21,6 @@
     <color name="secondaryBlue">#209985</color>
 
     <color name="toolbarBlue">#6C89BA</color>
+    <color name="listBlue">#2E336C</color>
+    <color name="buttonBlue">#484E98</color>
 </resources>

@@ -67,34 +67,6 @@ fun DoctorCard(doctorsViewModel: DoctorProfileViewModel = viewModel(), user: Doc
 }
 
 @Composable
-fun FavDoctorCard(doctorsViewModel: DoctorProfileViewModel = viewModel(), user: DoctorData) {
-    Card(
-        colors = CardDefaults.cardColors(colorResource(id = R.color.primaryPurple)),
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .height(80.dp)
-        //.border(2.dp, RoundedCornerShape(8.dp)), // Portocaliu și colțuri rotunjite
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
-        ) {
-            ImageForCard(imageUrl = user.imageUrl)
-            Text(
-                text = "${user.firstName} ${user.lastName}",
-                modifier = Modifier.padding(start = 16.dp),
-                color = Color.White
-            )
-            Spacer(Modifier.weight(1f))
-            IconButton(onClick = { doctorsViewModel.selectDoctor(user) }) {
-                Icon(painter = painterResource(id = R.drawable.more_details), contentDescription = "details")
-            }
-        }
-    }
-}
-
-@Composable
 fun ImageForCard(imageUrl: String?) {
         val painter = if (!imageUrl.isNullOrEmpty()) {
             rememberImagePainter(data = imageUrl)
@@ -140,10 +112,4 @@ fun FavDoctorDialog(doctorViewModel: DoctorProfileViewModel = viewModel()) {
     }
 }
 
-@Composable
-fun FavDoctorCard(favDoctorData: DoctorData) {
-    DividerTextComponent(stringResource(id = R.string.your_physiotherapist))
-    //DoctorCard(user = favDoctorData)
-    DividerTextComponent(stringResource(id = R.string.other_physiotherapists))
-}
 

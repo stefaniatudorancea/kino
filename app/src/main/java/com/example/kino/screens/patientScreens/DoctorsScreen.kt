@@ -14,7 +14,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.kino.R
 import com.example.kino.components.AppToolbar
@@ -25,17 +24,14 @@ import com.example.kino.rules.navigation.NavigationViewModel
 
 @Composable
 fun DoctorsScreen(navigationViewModel: NavigationViewModel = viewModel(), doctorsViewModel: DoctorsViewModel = viewModel()) {
-//    LaunchedEffect(Unit) {
-//        // Acest apel va reîmprospăta datele ori de câte ori intri pe acest ecran
-//        doctorsViewModel.fetchUsers()
-//    }
     Scaffold(
         bottomBar = {
-            NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = navigationViewModel.navigationItemsList[0].index)
+            NavigationAppBar(navigationItems = navigationViewModel.navigationItemsList, pageIndex = navigationViewModel.navigationItemsList[0].index)
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.chats)
+                toolbarTitle = stringResource(id = R.string.chats),
+                isDoctor = false
             )
         },
     ) { paddingValues ->
@@ -66,11 +62,4 @@ fun DoctorsScreen(navigationViewModel: NavigationViewModel = viewModel(), doctor
 
         }
     }
-}
-
-
-@Preview
-@Composable
-fun abdcv(){
-    DoctorsScreen()
 }

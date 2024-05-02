@@ -55,7 +55,7 @@ class NavigationViewModel: ViewModel() {
             unselectedIcon = Icons.Outlined.People,
             hasNews = false,
             badgeCount = null,
-            destination = Screen.DoctorsScreen
+            destination = Screen.PatientsListScreen
         ),
         NavigationItem(
             index = 1,
@@ -64,7 +64,7 @@ class NavigationViewModel: ViewModel() {
             unselectedIcon = Icons.Outlined.SportsGymnastics,
             hasNews = false,
             badgeCount = null,
-            destination = Screen.ChatsScreen
+            destination = Screen.RoutinesScreen
         ),
         NavigationItem(
             index = 2,
@@ -73,30 +73,30 @@ class NavigationViewModel: ViewModel() {
             unselectedIcon = Icons.Outlined.Person,
             hasNews = false,
             badgeCount = null,
-            destination = Screen.ProfileScreen
+            destination = Screen.ProfileDoctorScreen
         ),
     )
 
     fun onEvent(event: NavigationUIEvent) {
         when (event) {
-            is NavigationUIEvent.HomeButtonClicked -> {
+            is NavigationUIEvent.DoctorsListButtonClicked -> {
                 PostOfficeAppRouter.navigateTo(Screen.DoctorsScreen)
             }
             is NavigationUIEvent.ChatsButtonClicked -> {
                 PostOfficeAppRouter.navigateTo(Screen.ChatsScreen)
             }
-            is NavigationUIEvent.RoutineButtonClicked -> {
-                PostOfficeAppRouter.navigateTo(Screen.RoutineScreen)
-            }
             is NavigationUIEvent.ProfileButtonClicked -> {
-//                viewModelScope.launch {
-//                    EventBus.postEvent("TriggerAction")
-//                }
                 PostOfficeAppRouter.navigateTo(Screen.ProfileScreen)
             }
-
+            is NavigationUIEvent.PatientsListButtonClicked -> {
+                PostOfficeAppRouter.navigateTo(Screen.PatientsListScreen)
+            }
+            is NavigationUIEvent.RoutinesButtonClicked -> {
+                PostOfficeAppRouter.navigateTo(Screen.RoutinesScreen)
+            }
+            is NavigationUIEvent.ProfileDoctorButtonClicked -> {
+                PostOfficeAppRouter.navigateTo(Screen.ProfileDoctorScreen)
+            }
         }
     }
-
-
 }

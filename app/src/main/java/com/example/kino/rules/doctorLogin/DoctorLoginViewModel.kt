@@ -49,7 +49,7 @@ class DoctorLoginViewModel: ViewModel() {
 
                 if(it.isSuccessful){
                     loginInProcess.value = false
-                    PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
+                    PostOfficeAppRouter.navigateTo(Screen.PatientsListScreen)
                 }
             }
             .addOnFailureListener{

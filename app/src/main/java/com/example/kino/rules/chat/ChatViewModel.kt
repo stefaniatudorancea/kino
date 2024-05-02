@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.kino.app.EventBus
 import com.example.kino.data.ChatData
 import com.example.kino.data.Message
 import com.example.kino.data.USER_NODE
+import com.example.kino.data.UserDataForDoctorList
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -22,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.security.MessageDigest
 import javax.inject.Inject
 
@@ -31,16 +35,15 @@ class ChatViewModel: ViewModel() {
 
     var currentUser = FirebaseAuth.getInstance().currentUser!!.uid
 
-    private val _chatId = MutableLiveData<String?>()
-    val chatId: MutableLiveData<String?> = _chatId
-
     private val _currentConversation = MutableLiveData<String?>()
     val currentConversation: MutableLiveData<String?> = _currentConversation
+
+    private val _conversationPartener = MutableLiveData<UserDataForDoctorList>()
+    val conversationPartener: MutableLiveData<UserDataForDoctorList> = _conversationPartener
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
-    private val database = FirebaseDatabase.getInstance().reference
     private lateinit var messagesRef: DatabaseReference
     private var childEventListener: ChildEventListener? = null
 
@@ -59,9 +62,20 @@ class ChatViewModel: ViewModel() {
     }
 
     init{
-        getCurrentConversation()
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            getCurrentConversation(uid)
+        }
+        viewModelScope.launch {
+            EventBus.events.collect { event ->
+                if (event == "UpdateConversationId") {
+                    if (uid != null) {
+                        getCurrentConversation(uid)
+                    }
+                }
+            }
+        }
     }
-
 
     fun sendMessage(chatId: String, senderId: String, messageText: String) {
         val database = FirebaseDatabase.getInstance().reference
@@ -124,71 +138,39 @@ class ChatViewModel: ViewModel() {
         }
     }
 
-
-    private fun setupRealtimeUpdates() {
-        // Listener pentru mesaje noi sau schimbate
-        childEventListener = object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                snapshot.getValue(Message::class.java)?.let { message ->
-                    val updatedMessages = _messages.value.toMutableList().apply {
-                        add(message)
-                    }.sortedBy { it.timestamp }
-                    _messages.value = updatedMessages
-                }
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val message = snapshot.getValue(Message::class.java)
-                message?.let {
-                    val updatedMessages = _messages.value.toMutableList().apply {
-                        val index = indexOfFirst { it.messageId == it.messageId }
-                        if (index != -1) set(index, it)
-                    }
-                    _messages.value = updatedMessages
-                }
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                snapshot.getValue(Message::class.java)?.let { message ->
-                    val updatedMessages = _messages.value.toMutableList().apply {
-                        removeAll { it.messageId == message.messageId }
-                    }
-                    _messages.value = updatedMessages
-                }
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Database error: ${error.toException()}")
-            }
-        }
-        messagesRef.addChildEventListener(childEventListener as ChildEventListener)
-    }
-
-
-
     override fun onCleared() {
         super.onCleared()
         // Îndepărtăm listener-ul atunci când ViewModel-ul este distrus
         messagesRef?.removeEventListener(childEventListener!!)
     }
 
-    private fun updateMessageList(message: Message){
-        val currentList = _messages.value ?: emptyList()
-        val updatedList = currentList + message
-        _messages.value = updatedList
-    }
-
-    private fun getCurrentConversation(){
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        if (uid != null) {
-            FirebaseFirestore.getInstance().collection(USER_NODE).document(uid).get().addOnSuccessListener { document ->
-                _currentConversation.value = document.getString("currentConversation")
-                Log.d(ContentValues.TAG, "conversatia curenta: ${_currentConversation.value}")
-                setupMessageListener()
+    fun getCurrentConversation(uid: String){
+        FirebaseFirestore.getInstance().collection(USER_NODE).document(uid).get().addOnSuccessListener { document ->
+            val newConversationId = document.getString("currentConversation")
+            if (_currentConversation.value != newConversationId) {
+                _currentConversation.value = newConversationId
+                Log.d(ContentValues.TAG, "Conversația curentă: ${_currentConversation.value}")
+                resetMessagesAndSetupListener()
             }
         }
+    }
+
+    private fun resetMessagesAndSetupListener() {
+        // Îndepărtăm listener-ul vechi
+        childEventListener?.let { listener ->
+            messagesRef.removeEventListener(listener)
+            childEventListener = null // Resetăm listener-ul
+        }
+
+        // Resetăm lista de mesaje
+        _messages.value = emptyList()
+
+        // Setup-ul noului listener pentru noua conversație
+        setupMessageListener()
+    }
+
+    fun updateConversationPartener(user: UserDataForDoctorList){
+        _conversationPartener.value = user
     }
 
     private fun printState() {

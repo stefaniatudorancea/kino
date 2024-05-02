@@ -61,11 +61,6 @@ object Validator {
         )
     }
 
-    fun validateChatField(chatField: String): ValidationResult{
-        return ValidationResult(
-            chatField.isNotEmpty()
-        )
-    }
 }
 
 data class ValidationResult(

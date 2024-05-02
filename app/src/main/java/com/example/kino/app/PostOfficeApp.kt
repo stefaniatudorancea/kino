@@ -1,5 +1,7 @@
 package com.example.kino.app
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
@@ -8,11 +10,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
+import com.example.kino.screens.doctorScreens.AssignRoutinesScreen
+import com.example.kino.screens.doctorScreens.CreateExerciseScreen
+import com.example.kino.screens.doctorScreens.CreateRoutineScreen
+import com.example.kino.screens.doctorScreens.DoctorChatScreen
 import com.example.kino.screens.patientScreens.ChatsScreen
 import com.example.kino.screens.doctorScreens.DoctorLoginScreen
 import com.example.kino.screens.doctorScreens.DoctorFirstSignupScreen
 import com.example.kino.screens.patientScreens.DoctorProfileScreen
 import com.example.kino.screens.doctorScreens.DoctorSecondSignupScreen
+import com.example.kino.screens.doctorScreens.ExercisesScreen
+import com.example.kino.screens.doctorScreens.PatientsListScreen
+import com.example.kino.screens.doctorScreens.ProfileDoctorScreen
+import com.example.kino.screens.doctorScreens.RoutinesScreen
 import com.example.kino.screens.patientScreens.DoctorsScreen
 import com.example.kino.screens.patientScreens.HomeScreen
 import com.example.kino.screens.patientScreens.LoginScreen
@@ -21,6 +31,7 @@ import com.example.kino.screens.patientScreens.RoutineScreen
 import com.example.kino.screens.patientScreens.SignUpScreen
 import com.example.kino.screens.patientScreens.TermnAndConditionsSceen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PostOfficeApp(){
     Surface(modifier = Modifier.fillMaxSize(),
@@ -60,8 +71,32 @@ fun PostOfficeApp(){
                 is Screen.DoctorLoginScreen -> {
                     DoctorLoginScreen()
                 }
+                is Screen.ProfileDoctorScreen -> {
+                    ProfileDoctorScreen()
+                }
                 is Screen.DoctorProfileScreen -> {
                     DoctorProfileScreen()
+                }
+                is Screen.PatientsListScreen -> {
+                    PatientsListScreen()
+                }
+                is Screen.RoutinesScreen -> {
+                    RoutinesScreen()
+                }
+                is Screen.DoctorChatScreen -> {
+                    DoctorChatScreen()
+                }
+                is Screen.AssignRoutinesScreen -> {
+                    AssignRoutinesScreen()
+                }
+                is Screen.ExercisesScreen -> {
+                    ExercisesScreen()
+                }
+                is Screen.CreateExerciseScreen -> {
+                    CreateExerciseScreen()
+                }
+                is Screen.CreateRoutineScreen -> {
+                    CreateRoutineScreen()
                 }
             }
         }

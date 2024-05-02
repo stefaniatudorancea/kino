@@ -8,6 +8,9 @@ object EventBus {
     private val _events = MutableSharedFlow<String>()
     val events: SharedFlow<String> = _events.asSharedFlow()
 
+    private val _loadChatIdEvent = MutableSharedFlow<String>()
+    val loadChatIdEvent: SharedFlow<String> = _loadChatIdEvent.asSharedFlow()
+
     suspend fun postEvent(event: String) {
         _events.emit(event)
     }

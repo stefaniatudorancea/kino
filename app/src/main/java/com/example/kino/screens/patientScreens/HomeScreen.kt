@@ -24,11 +24,11 @@ fun HomeScreen(navigationViewModel: NavigationViewModel = viewModel()) {
 
     Scaffold(
         bottomBar = {
-            NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = navigationViewModel.navigationItemsList[0].index)
+            NavigationAppBar(navigationItems = navigationViewModel.navigationItemsList, pageIndex = navigationViewModel.navigationItemsList[0].index)
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.home))
+                toolbarTitle = stringResource(id = R.string.home), isDoctor = false)
         },
     ) { paddingValues ->
         Surface(

@@ -1,8 +1,11 @@
 package com.example.kino.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +38,9 @@ import com.example.kino.data.DoctorData
 import com.example.kino.data.Message
 import com.example.kino.rules.chat.ChatViewModel
 import com.google.firebase.auth.FirebaseAuth
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ChatTextField(
@@ -74,6 +80,7 @@ fun ChatTextField(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ReceivedMessage(message: Message, currentUser: String) {
     Box(
@@ -88,21 +95,39 @@ fun ReceivedMessage(message: Message, currentUser: String) {
             ),
             modifier = Modifier
                 .padding(horizontal = 8.dp)
-                .widthIn(min = 10.dp, max = 300.dp)  // Limităm lățimea cardului între 100.dp și 300.dp
+                .widthIn(
+                    min = 10.dp,
+                    max = 300.dp
+                )  // Limităm lățimea cardului între 100.dp și 300.dp
                 .wrapContentHeight()  // Înălțimea se adaptează la conținut
         ) {
-            Text(
-                text = message.text,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .background(
-                        color = if (message.senderId == currentUser) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .padding(horizontal = 10.dp, vertical = 6.dp)  // Padding intern pentru text
-            )
+            Column {
+                Text(
+                    text = message.text,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+
+                        .padding(horizontal = 10.dp, vertical = 6.dp)  // Padding intern pentru text
+                )
+                Text(
+                    text = extractHourFromTimestampString(message.timestamp),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 0.dp, end = 0.dp, bottom = 10.dp)  // Padding intern pentru text
+                )
+            }
         }
     }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun extractHourFromTimestampString(timestampString: String): String {
+    val timestamp = timestampString.toLong()
+    val instant = Instant.ofEpochMilli(timestamp)
+    val localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime()
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    return formatter.format(localDateTime)
 }
 
 

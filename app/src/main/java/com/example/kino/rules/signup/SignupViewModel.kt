@@ -33,7 +33,6 @@ class SignupViewModel : ViewModel() {
     private val _imageUrl = MutableLiveData<String?>()
     val imageUrl: LiveData<String?> = _imageUrl
     fun onEvent(event: SignupUIEvent) {
-
         when (event) {
             is SignupUIEvent.PhotoChanged -> {
                 registartionUIState.value = registartionUIState.value.copy(

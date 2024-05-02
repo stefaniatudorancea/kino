@@ -19,11 +19,11 @@ import com.example.kino.rules.navigation.NavigationViewModel
 fun RoutineScreen(navigationViewModel: NavigationViewModel = viewModel()) {
     Scaffold(
         bottomBar = {
-            NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = navigationViewModel.navigationItemsList[2].index)
+            NavigationAppBar(navigationItems = navigationViewModel.navigationItemsList, pageIndex = navigationViewModel.navigationItemsList[2].index)
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.routine))
+                toolbarTitle = stringResource(id = R.string.routine), isDoctor = false)
         },
     ) { paddingValues ->
         Surface(

@@ -35,11 +35,12 @@ fun ProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), userVi
     val user by userViewModel.user.collectAsState()
     Scaffold(
         bottomBar = {
-            NavigationAppBar(navigationViewModel = navigationViewModel, pageIndex = null)
+            NavigationAppBar(navigationItems = navigationViewModel.navigationItemsList, pageIndex = null)
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.my_profile)
+                toolbarTitle = stringResource(id = R.string.my_profile),
+                isDoctor = false
             )
         },
     ){

@@ -67,26 +67,23 @@ class UserViewModel: ViewModel() {
 
 
     fun logout() {
-        val firebaseAuth = FirebaseAuth.getInstance()
-
-        // Definirea listenerului ca variabilă locală.
-        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuthInstance ->
-            if (firebaseAuthInstance.currentUser == null) {
-                Log.d(TAG, "User successfully signed out")
-                // Navighează către ecranul de login după ce te-ai asigurat că sign out a avut succes
+        val fireBaseAuth = FirebaseAuth.getInstance()
+        var auth: FirebaseAuth
+        auth = Firebase.auth
+        val currentUser = auth.currentUser
+        fireBaseAuth.signOut()
+        Log.d(TAG, "current: $currentUser")
+        val authStateListener = FirebaseAuth.AuthStateListener {
+            if (it.currentUser == null) {
+                Log.d(TAG, "Inside sign out success")
                 PostOfficeAppRouter.navigateTo(Screen.LoginScreen)
-                // Elimină listenerul după ce a fost folosit
-                firebaseAuth.removeAuthStateListener(authStateListener)
             } else {
-                Log.d(TAG, "Sign out is not complete")
+                Log.d(TAG, "Inside sign out is not complete")
             }
         }
-
-        // Adaugă listenerul înainte de a apela signOut pentru a capta schimbarea de stare
-        firebaseAuth.addAuthStateListener(authStateListener)
-        // Apelarea metodei signOut pentru a deconecta utilizatorul
-        firebaseAuth.signOut()
+        fireBaseAuth.addAuthStateListener(authStateListener)
     }
+
 
 
 

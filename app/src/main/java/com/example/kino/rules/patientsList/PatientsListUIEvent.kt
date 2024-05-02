@@ -1,4 +1,5 @@
 package com.example.kino.rules.patientsList
 
-class PatientsListUIEvent {
+sealed class PatientsListUIEvent {
+    object ViewChatButtonClicked: PatientsListUIEvent()
 }

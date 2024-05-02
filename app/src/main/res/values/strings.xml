@@ -42,4 +42,12 @@
     <string name="your_physiotherapist">Your physiotherapist</string>
     <string name="other_physiotherapists">Other physiotherapists</string>
 
+    <string name="patients">Patients</string>
+    <string name="list_of_routines">List of routines</string>
+    <string name="assign_a_routine">Assign routine</string>
+    <string name="create_a_routine">Create routine</string>
+    <string name="exercise_description">Exercise description</string>
+    <string name="nr_repetitions">Number of repetitions</string>
+    <string name="create_exercise">Add exercise</string>
+
 </resources>
