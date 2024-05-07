@@ -95,7 +95,13 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:1.4.0")
     implementation("androidx.compose.runtime:runtime-livedata:$compose_version")
+//    //implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+//    implementation("com.google.android.exoplayer:exoplayer-core:2.19.1")
+//    implementation("com.google.android.exoplayer:exoplayer-core:2.19.1")
 
+    // in .kts
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
 
     implementation("com.google.dagger:hilt-android:2.44.2")
     kapt("com.google.dagger:hilt-android-compiler:2.44.2")

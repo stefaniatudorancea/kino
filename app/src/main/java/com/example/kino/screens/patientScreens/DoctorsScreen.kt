@@ -30,7 +30,7 @@ fun DoctorsScreen(navigationViewModel: NavigationViewModel = viewModel(), doctor
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.chats),
+                toolbarTitle = stringResource(id = R.string.doctors_list),
                 isDoctor = false
             )
         },

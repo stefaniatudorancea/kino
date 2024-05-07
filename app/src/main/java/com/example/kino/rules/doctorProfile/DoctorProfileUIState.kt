@@ -1,4 +1,5 @@
 package com.example.kino.rules.doctorProfile
 
-class DoctorProfileUIState {
-}
+data class DoctorProfileUIState(
+    var review: String = ""
+)

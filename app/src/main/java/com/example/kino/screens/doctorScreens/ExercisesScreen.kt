@@ -7,18 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -31,14 +26,15 @@ import com.example.kino.R
 import com.example.kino.components.AppTabBarRoutinesExercises
 import com.example.kino.components.BackButton
 import com.example.kino.components.ButtonComponent
+import com.example.kino.components.ExerciseItem
 import com.example.kino.components.NavigationAppBar
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
+import com.example.kino.rules.exercise.ExerciseViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
-import com.example.kino.rules.patientsList.PatientsListViewModel
 
 @Composable
-fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), patientsListViewModel: PatientsListViewModel = viewModel()){
+fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), exerciseViewModel: ExerciseViewModel = viewModel()){
     Scaffold(
         bottomBar = {
             NavigationAppBar(
@@ -61,11 +57,10 @@ fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), pati
                 .padding(paddingValues)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                val scrollState = rememberLazyListState()
+                val exercises = exerciseViewModel.exercises.collectAsState().value
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        //.padding(horizontal = 0.dp, vertical = 10.dp)
                         .padding(top = 0.dp),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
@@ -92,8 +87,16 @@ fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), pati
                         isEnabled = true
                     )
                 }
+                LazyColumn {
+                    items(exercises) { exercise ->
+                        ExerciseItem(exercise)
+                    }
+                }
+
             }
         }
 
     }
 }
+
+

@@ -2,6 +2,7 @@ package com.example.kino.rules.doctorProfile
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,8 @@ import com.example.kino.app.EventBus
 import com.example.kino.data.ChatData
 import com.example.kino.data.DOCTOR_NODE
 import com.example.kino.data.DoctorData
+import com.example.kino.data.DoctorReview
+import com.example.kino.data.ExerciseDataDb
 import com.example.kino.data.USER_NODE
 import com.example.kino.data.UserData
 import com.example.kino.data.UserDataForDoctorList
@@ -20,14 +23,23 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
 
 class DoctorProfileViewModel: ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+
+    var doctorProfileUIState = mutableStateOf(DoctorProfileUIState())
+    var sizeReviews = mutableStateOf(0)
+    var seeReviews = mutableStateOf(false)
+
+    private val _reviews = MutableStateFlow<List<DoctorReview>>(emptyList())
+    val reviews = _reviews.asStateFlow()
 
     private val _selectedDoctor = MutableLiveData<DoctorData?>()
     val selectedDoctor: LiveData<DoctorData?> = _selectedDoctor
@@ -35,15 +47,31 @@ class DoctorProfileViewModel: ViewModel() {
     private val _currentUser = MutableLiveData<UserData?>()
     val currentUser: LiveData<UserData?> = _currentUser
 
+    private val _currentFavDoctor = MutableLiveData<String?>()
+    val currentFavDoctor: LiveData<String?> = _currentFavDoctor
+
     private val _currentUserForDoctorList = MutableLiveData<UserDataForDoctorList?>()
     val currentUserForDoctorList: LiveData<UserDataForDoctorList?> = _currentUserForDoctorList
-
 
     private val _showDialog = MutableStateFlow(false)
     val showDialog = _showDialog.asStateFlow()
 
+    private val _showReviewDialog = MutableStateFlow(false)
+    val showReviewDialog = _showReviewDialog.asStateFlow()
+
     fun onEvent(event: DoctorProfileUIEvent){
         when(event){
+            is DoctorProfileUIEvent.ReviewChanged -> {
+                doctorProfileUIState.value = doctorProfileUIState.value.copy(
+                    review = event.review
+                )
+            }
+            is DoctorProfileUIEvent.AddReviewButtonClicked -> {
+                addReview()
+            }
+            is DoctorProfileUIEvent.SeeReviewsTextClicked -> {
+                seeReviews.value = !seeReviews.value
+            }
             is DoctorProfileUIEvent.ConfirmDialogButtonClicked -> {
                 dismissDialog()
                 removeFromPatientList()
@@ -68,8 +96,95 @@ class DoctorProfileViewModel: ViewModel() {
         _showDialog.value = false
     }
 
+    fun showConfirmationReviewDialog() {
+        _showReviewDialog.value = true
+    }
+
+
+    fun dismissReviewDialog() {
+        _showReviewDialog.value = false
+    }
+
+    fun addReview() {
+        viewModelScope.launch {
+            // Obțineți datele utilizatorului curent
+            val user = _currentUser.value ?: return@launch
+            val doctorId = _selectedDoctor.value?.uid ?: return@launch
+
+            val review = DoctorReview(
+                firstName = user.firstName,
+                lastName = user.lastName,
+                textReview = doctorProfileUIState.value.review,
+                timestamp = System.currentTimeMillis().toString() // Folosim timpul curent ca timestamp
+            )
+
+            // Adăugăm recenzia în sub-colecția 'reviews' a medicului specificat
+            db.collection(DOCTOR_NODE)
+                .document(doctorId)
+                .collection("reviews")
+                .add(review)
+                .addOnSuccessListener {
+                    dismissReviewDialog()
+                    fetchExercises(doctorId)
+                    Log.d("DoctorProfileViewModel", "Review added successfully")
+
+                }
+                .addOnFailureListener { e ->
+                    Log.w("DoctorProfileViewModel", "Error adding review", e)
+                }
+        }
+    }
+
+//    fun getReviews() {
+//        viewModelScope.launch {
+//            val doctorId = _selectedDoctor.value?.uid ?: return@launch  // Asigură-te că avem un ID de doctor
+//
+//            try {
+//                val reviewsList = db.collection("doctors")
+//                    .document(doctorId)
+//                    .collection("reviews")
+//                    .get()
+//                    .await()
+//                    .mapNotNull { document ->
+//                        document.toObject(DoctorReview::class.java)
+//                    }
+//                _reviews.value = reviewsList
+//                sizeReviews.value = reviews.value.count()
+//            } catch (e: Exception) {
+//                Log.e("DoctorProfileViewModel", "Error fetching reviews", e)
+//            }
+//        }
+//    }
+
+    fun fetchExercises(uidDoctor: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val snapshot = db.collection(DOCTOR_NODE)
+                    .document(uidDoctor)
+                    .collection("reviews")
+                    .get()
+                    .await()
+                if (snapshot.isEmpty) {
+                    Log.d(TAG, "No exercises found")
+                }
+                val reviewList = snapshot.documents.mapNotNull { document ->
+                    document.toObject(DoctorReview::class.java)?.apply {
+                        Log.d(TAG, "Fetched exercise: $this")
+                    }
+                }
+                _reviews.value = reviewList
+                sizeReviews.value = reviews.value.size
+                Log.d(TAG, "Exercises loaded successfully")
+            } catch (e: Exception) {
+                Log.w(TAG, "Error fetching exercises", e)
+            }
+        }
+    }
+
+
     fun selectDoctor(doctor: DoctorData) {
         _selectedDoctor.value = doctor
+        fetchExercises(doctor.uid)
         PostOfficeAppRouter.navigateTo(Screen.DoctorProfileScreen)
     }
 
@@ -82,6 +197,8 @@ class DoctorProfileViewModel: ViewModel() {
                     // Aici poți să tratezi cazul în care actualizarea a reușit
                     Log.d( "UpdateDoc", "Document successfully updated!")
                     addPatientToDoctorList()
+                    _currentFavDoctor.value = selectedDoctor.value?.uid
+                    Log.d( "UpdateDoc", "noul current fav doctor is: ${selectedDoctor.value?.uid}")
                     viewModelScope.launch {
                         EventBus.postEvent("UpdateConversationId")
                     }
@@ -118,7 +235,8 @@ class DoctorProfileViewModel: ViewModel() {
         if (selectedDoctor != null) {
             // Utilizează FieldValue.arrayUnion pentru a adăuga noul pacient în array-ul patientsList
             selectedDoctor.update("patientsList", FieldValue.arrayUnion(currentUserForDoctorList))
-                .addOnSuccessListener { Log.d(TAG, "Patient successfully added to patientsList") }
+                .addOnSuccessListener {
+                    Log.d(TAG, "Patient successfully added to patientsList") }
                 .addOnFailureListener { e -> Log.w(TAG, "Error adding patient to patientsList", e) }
         }
     }
@@ -191,12 +309,14 @@ class DoctorProfileViewModel: ViewModel() {
                 _currentUser.value = userData
                 val userDataForDoctorList = document.toObject(UserDataForDoctorList::class.java)
                 _currentUserForDoctorList.value = userDataForDoctorList
+                _currentFavDoctor.value = currentUser.value?.favDoctor
             }.addOnFailureListener { e ->
                 // Handle the error
             }
         }
     }
 
+    //functia care se apeleaza initial
     fun addFavDoctor() {
         val currentUid = auth.currentUser?.uid
         val currentUser = currentUid?.let { db.collection(USER_NODE).document(it) }

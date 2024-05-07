@@ -34,7 +34,7 @@
     <string name="linkedln">Linkedln</string>
     <string name="write_message">Write a message</string>
 
-    <string name="doctor_profile">"Doctor's profile"</string>
+    <string name="doctor_profile">"Physiotherapist's profile"</string>
     <string name="your_profile">"Your profile"</string>
     <string name="my_profile">"My profile"</string>
     <string name="try_collab">"Try a collaboration"</string>
@@ -43,11 +43,22 @@
     <string name="other_physiotherapists">Other physiotherapists</string>
 
     <string name="patients">Patients</string>
+    <string name="add">Add</string>
     <string name="list_of_routines">List of routines</string>
     <string name="assign_a_routine">Assign routine</string>
     <string name="create_a_routine">Create routine</string>
     <string name="exercise_description">Exercise description</string>
+    <string name="exercise_name">Exercise name</string>
     <string name="nr_repetitions">Number of repetitions</string>
     <string name="create_exercise">Add exercise</string>
+    <string name="add_review">Add a review</string>
 
+    <string name="confirmation_end_collaboration">Do you want to end the collaboration with the current physiotherapist?</string>
+    <string name="close">Close</string>
+    <string name="done">Done</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="doctors_list">List of physiotherapists</string>
+
+    <string name="physiotherapist_reviews">Physiotherapist reviews</string>
 </resources>

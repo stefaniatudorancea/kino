@@ -14,3 +14,10 @@ data class DoctorData(
     var linkedln: String = "",
     var privacyPolicyAccepted: Boolean = false,
 )
+
+data class DoctorReview(
+    var firstName: String = "",
+    var lastName: String = "",
+    var textReview: String = "",
+    var timestamp: String = "",
+)

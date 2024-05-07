@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -353,10 +354,19 @@ fun ImageViewer(imageUri: Uri?, imageUrl: String?, onButtonClicked: () -> Unit) 
 
 @Composable
 fun BackButton() {
-    IconButton(onClick = { PostOfficeAppRouter.goBack() }) {
-        Icon(
-            imageVector = Icons.Filled.ArrowBack,
-            contentDescription = "Back"
-        )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            //.padding(horizontal = 0.dp, vertical = 10.dp)
+            .padding(top = 0.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        IconButton(onClick = { PostOfficeAppRouter.goBack() }) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Back"
+            )
+        }
     }
 }
