@@ -64,7 +64,7 @@ class NavigationViewModel: ViewModel() {
             unselectedIcon = Icons.Outlined.SportsGymnastics,
             hasNews = false,
             badgeCount = null,
-            destination = Screen.RoutinesScreen
+            destination = Screen.RoutinesListScreen
         ),
         NavigationItem(
             index = 2,
@@ -92,7 +92,7 @@ class NavigationViewModel: ViewModel() {
                 PostOfficeAppRouter.navigateTo(Screen.PatientsListScreen)
             }
             is NavigationUIEvent.RoutinesButtonClicked -> {
-                PostOfficeAppRouter.navigateTo(Screen.RoutinesScreen)
+                PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen)
             }
             is NavigationUIEvent.ProfileDoctorButtonClicked -> {
                 PostOfficeAppRouter.navigateTo(Screen.ProfileDoctorScreen)

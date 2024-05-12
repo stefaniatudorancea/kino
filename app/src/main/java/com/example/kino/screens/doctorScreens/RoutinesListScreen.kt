@@ -26,15 +26,16 @@ import com.example.kino.R
 import com.example.kino.components.AppTabBarRoutinesExercises
 import com.example.kino.components.BackButton
 import com.example.kino.components.ButtonComponent
-import com.example.kino.components.ExerciseItem
+import com.example.kino.components.RoutineItem
 import com.example.kino.components.NavigationAppBar
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
-import com.example.kino.rules.exercise.ExerciseViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
+import com.example.kino.rules.routine.RoutineViewModel
 
 @Composable
-fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), exerciseViewModel: ExerciseViewModel = viewModel()){
+fun RoutinesListScreen(navigationViewModel: NavigationViewModel = viewModel(), routinesViewModel: RoutineViewModel = viewModel()) {
+    val routines = routinesViewModel.routines.collectAsState().value
     Scaffold(
         bottomBar = {
             NavigationAppBar(
@@ -43,12 +44,12 @@ fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), exer
             )
         },
         topBar = {
-            AppTabBarRoutinesExercises(onTabSelected = { screen ->
+            AppTabBarRoutinesExercises(
+                currentTab = 0, onTabSelected = { screen ->
                 PostOfficeAppRouter.navigateTo(screen)
             })
         },
-    ){
-            paddingValues ->
+    ) { paddingValues ->
         Surface(
             color = Color.White,
             modifier = Modifier
@@ -56,17 +57,8 @@ fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), exer
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
+
             Column(modifier = Modifier.fillMaxSize()) {
-                val exercises = exerciseViewModel.exercises.collectAsState().value
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 0.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    BackButton()
-                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -75,8 +67,8 @@ fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), exer
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ButtonComponent(
-                        value = stringResource(id = R.string.create_exercise),
-                        onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.CreateExerciseScreen) },
+                        value = stringResource(id = R.string.create_a_routine),
+                        onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.CreateRoutineScreen) },
                         brush = Brush.horizontalGradient(
                             listOf(
                                 colorResource(id = R.color.buttonBlue),
@@ -88,15 +80,12 @@ fun ExercisesScreen(navigationViewModel: NavigationViewModel = viewModel(), exer
                     )
                 }
                 LazyColumn {
-                    items(exercises) { exercise ->
-                        ExerciseItem(exercise)
+                    items(routines) { routine ->
+                        RoutineItem(routine)
                     }
                 }
-
             }
         }
-
     }
 }
-
 

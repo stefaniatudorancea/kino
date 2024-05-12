@@ -57,8 +57,16 @@
     <string name="close">Close</string>
     <string name="done">Done</string>
     <string name="yes">Yes</string>
+    <string name="open">Open</string>
     <string name="no">No</string>
     <string name="doctors_list">List of physiotherapists</string>
 
     <string name="physiotherapist_reviews">Physiotherapist reviews</string>
+    <string name="series">Series</string>
+    <string name="repetitions">Repetitions</string>
+    <string name="disease">Disease</string>
+    <string name="description">Description</string>
+    <string name="assign">Assign</string>
+    <string name="create_routine">Create routine</string>
+
 </resources>

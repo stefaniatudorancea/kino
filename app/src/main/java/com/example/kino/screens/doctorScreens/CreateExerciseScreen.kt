@@ -114,7 +114,5 @@ fun CreateExerciseScreen(exerciseViewModel: ExerciseViewModel = viewModel())
                 }
             }
         }
-
     }
-
 }

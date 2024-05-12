@@ -9,7 +9,6 @@ sealed class Screen(){
     object TermsAndConditionsScreen: Screen()
     object HomeScreen: Screen()
     object ChatsScreen: Screen()
-    object RoutineScreen: Screen()
     object DoctorsScreen: Screen()
     object ProfileScreen: Screen()
     object DoctorProfileScreen: Screen()
@@ -18,12 +17,14 @@ sealed class Screen(){
     object DoctorLoginScreen: Screen()
     object ProfileDoctorScreen: Screen()
     object PatientsListScreen: Screen()
-    object RoutinesScreen: Screen()
-    object ExercisesScreen: Screen()
+    object RoutinesListScreen: Screen()
+    object ExercisesListScreen: Screen()
     object DoctorChatScreen: Screen()
     object AssignRoutinesScreen: Screen()
     object CreateExerciseScreen: Screen()
+    object ExerciseScreen: Screen()
     object CreateRoutineScreen: Screen()
+    object RoutineScreen: Screen()
 }
 
 object PostOfficeAppRouter{

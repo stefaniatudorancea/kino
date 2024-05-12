@@ -7,19 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,14 +25,18 @@ import com.example.kino.R
 import com.example.kino.components.AppTabBarRoutinesExercises
 import com.example.kino.components.BackButton
 import com.example.kino.components.ButtonComponent
+import com.example.kino.components.ExerciseItem
 import com.example.kino.components.NavigationAppBar
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
+import com.example.kino.rules.exercise.ExerciseViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
-import com.example.kino.rules.patientsList.PatientsListViewModel
 
 @Composable
-fun RoutinesScreen(navigationViewModel: NavigationViewModel = viewModel(), patientsListViewModel: PatientsListViewModel = viewModel()) {
+fun ExercisesListScreen(
+    navigationViewModel: NavigationViewModel = viewModel(),
+    exerciseViewModel: ExerciseViewModel = viewModel()
+) {
     Scaffold(
         bottomBar = {
             NavigationAppBar(
@@ -48,7 +45,7 @@ fun RoutinesScreen(navigationViewModel: NavigationViewModel = viewModel(), patie
             )
         },
         topBar = {
-            AppTabBarRoutinesExercises(onTabSelected = { screen ->
+            AppTabBarRoutinesExercises(currentTab = 1, onTabSelected = { screen ->
                 PostOfficeAppRouter.navigateTo(screen)
             })
         },
@@ -61,17 +58,7 @@ fun RoutinesScreen(navigationViewModel: NavigationViewModel = viewModel(), patie
                 .padding(paddingValues)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                val scrollState = rememberLazyListState()
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        //.padding(horizontal = 0.dp, vertical = 10.dp)
-                        .padding(top = 0.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    BackButton()
-                }
+                val exercises = exerciseViewModel.exercises.collectAsState().value
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -80,8 +67,8 @@ fun RoutinesScreen(navigationViewModel: NavigationViewModel = viewModel(), patie
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ButtonComponent(
-                        value = stringResource(id = R.string.create_a_routine),
-                        onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.CreateRoutineScreen) },
+                        value = stringResource(id = R.string.create_exercise),
+                        onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.CreateExerciseScreen) },
                         brush = Brush.horizontalGradient(
                             listOf(
                                 colorResource(id = R.color.buttonBlue),
@@ -92,7 +79,16 @@ fun RoutinesScreen(navigationViewModel: NavigationViewModel = viewModel(), patie
                         isEnabled = true
                     )
                 }
+                LazyColumn {
+                    items(exercises) { exercise ->
+                        ExerciseItem(
+                            exercise = exercise,
+                            { exerciseViewModel.selectExercise(exercise) })
+                    }
+                }
             }
         }
     }
 }
+
+

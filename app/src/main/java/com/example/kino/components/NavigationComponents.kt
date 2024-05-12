@@ -73,9 +73,8 @@ fun AppToolbar(toolbarTitle: String, isDoctor: Boolean, chatScreen: Boolean = fa
 }
 
 @Composable
-fun AppTabBarRoutinesExercises(onTabSelected: (Screen) -> Unit) {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    val coroutineScope = rememberCoroutineScope()
+fun AppTabBarRoutinesExercises(currentTab: Int, onTabSelected: (Screen) -> Unit) {
+    var selectedTabIndex by remember { mutableStateOf(currentTab) }
     val tabTitles = listOf("Routines", "Exercises")
     TabRow(
         selectedTabIndex = selectedTabIndex,
@@ -99,13 +98,10 @@ fun AppTabBarRoutinesExercises(onTabSelected: (Screen) -> Unit) {
                 selected = selectedTabIndex == index,
                 onClick = {
                     selectedTabIndex = index
-                    coroutineScope.launch {
-                        delay(200)
                         when (title) {
-                            "Routines" -> onTabSelected(Screen.RoutinesScreen)
-                            "Exercises" -> onTabSelected(Screen.ExercisesScreen)
+                            "Routines" -> onTabSelected(Screen.RoutinesListScreen)
+                            "Exercises" -> onTabSelected(Screen.ExercisesListScreen)
                         }
-                    }
                 }
             )
         }

@@ -23,5 +23,7 @@
     <color name="toolbarBlue">#6C89BA</color>
     <color name="listBlue">#2E336C</color>
     <color name="buttonBlue">#484E98</color>
+
     <color name="reviewCardPurple">#AB97C3</color>
+    <color name="cardBlue">#B0C3DA</color>
 </resources>

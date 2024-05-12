@@ -19,15 +19,16 @@ import com.example.kino.screens.doctorScreens.DoctorLoginScreen
 import com.example.kino.screens.doctorScreens.DoctorFirstSignupScreen
 import com.example.kino.screens.patientScreens.DoctorProfileScreen
 import com.example.kino.screens.doctorScreens.DoctorSecondSignupScreen
-import com.example.kino.screens.doctorScreens.ExercisesScreen
+import com.example.kino.screens.doctorScreens.ExerciseScreen
+import com.example.kino.screens.doctorScreens.ExercisesListScreen
 import com.example.kino.screens.doctorScreens.PatientsListScreen
 import com.example.kino.screens.doctorScreens.ProfileDoctorScreen
-import com.example.kino.screens.doctorScreens.RoutinesScreen
+import com.example.kino.screens.doctorScreens.RoutineScreen
+import com.example.kino.screens.doctorScreens.RoutinesListScreen
 import com.example.kino.screens.patientScreens.DoctorsScreen
 import com.example.kino.screens.patientScreens.HomeScreen
 import com.example.kino.screens.patientScreens.LoginScreen
 import com.example.kino.screens.patientScreens.ProfileScreen
-import com.example.kino.screens.patientScreens.RoutineScreen
 import com.example.kino.screens.patientScreens.SignUpScreen
 import com.example.kino.screens.patientScreens.TermnAndConditionsSceen
 
@@ -80,8 +81,8 @@ fun PostOfficeApp(){
                 is Screen.PatientsListScreen -> {
                     PatientsListScreen()
                 }
-                is Screen.RoutinesScreen -> {
-                    RoutinesScreen()
+                is Screen.RoutinesListScreen -> {
+                    RoutinesListScreen()
                 }
                 is Screen.DoctorChatScreen -> {
                     DoctorChatScreen()
@@ -89,14 +90,17 @@ fun PostOfficeApp(){
                 is Screen.AssignRoutinesScreen -> {
                     AssignRoutinesScreen()
                 }
-                is Screen.ExercisesScreen -> {
-                    ExercisesScreen()
+                is Screen.ExercisesListScreen -> {
+                    ExercisesListScreen()
                 }
                 is Screen.CreateExerciseScreen -> {
                     CreateExerciseScreen()
                 }
                 is Screen.CreateRoutineScreen -> {
                     CreateRoutineScreen()
+                }
+                is Screen.ExerciseScreen -> {
+                    ExerciseScreen()
                 }
             }
         }

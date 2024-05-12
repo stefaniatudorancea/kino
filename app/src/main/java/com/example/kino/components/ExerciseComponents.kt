@@ -1,5 +1,9 @@
 package com.example.kino.components
 
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,23 +12,32 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.example.kino.R
 import com.example.kino.data.ExerciseDataDb
 
 @Composable
@@ -56,20 +69,64 @@ fun VideoPlayer(uri: String) {
 }
 
 @Composable
-fun ExerciseItem(exercise: ExerciseDataDb) {
+fun SeeVideoPlayer(videoUrl: String) {
+    val context = LocalContext.current
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            playWhenReady = true  // Autoplay when ready
+        }
+    }
+    LaunchedEffect(videoUrl) {
+        if (videoUrl.isNotBlank()) {
+            val mediaItem = MediaItem.fromUri(videoUrl)
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.prepare()
+        }
+    }
+    DisposableEffect(exoPlayer) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+    AndroidView(
+        modifier = Modifier.size(300.dp, 520.dp),
+        factory = { ctx ->
+            PlayerView(ctx).apply {
+                player = exoPlayer
+                layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+        }
+    )
+}
+
+
+@Composable
+fun ExerciseItem(exercise: ExerciseDataDb, onCardClicked: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable(onClick = onCardClicked),
+        colors = CardDefaults.cardColors(colorResource(id = R.color.cardBlue))
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = "Name: ${exercise.name}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Description: ${exercise.description}")
-            exercise.videoUri?.let { uri ->
-                Text(text = "Video URL: $uri")
-            }
+            Text(
+                text = "${exercise.name}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "${exercise.description}",
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -102,6 +159,24 @@ fun CreateExFieldComponent(
         keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
         singleLine = false,
     )
+}
+
+@Composable
+fun ExerciseDetailsCard(label: String, value: String?) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp)
+            .border(2.dp, Color.Gray, RoundedCornerShape(30.dp)),
+        shape = RoundedCornerShape(30),
+        colors = CardDefaults.cardColors(colorResource(id = R.color.white))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "$label", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "$value", style = MaterialTheme.typography.bodyLarge)
+
+        }
+    }
 }
 
 

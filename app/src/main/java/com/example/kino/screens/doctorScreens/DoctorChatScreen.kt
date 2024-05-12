@@ -84,7 +84,7 @@ fun DoctorChatScreen(navigationViewModel: NavigationViewModel = viewModel(), cha
                 ) {
                     ButtonComponent(
                         value = stringResource(id = R.string.assign_a_routine),
-                        onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.RoutinesScreen) },
+                        onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen) },
                         brush = Brush.horizontalGradient(
                             listOf(
                                 colorResource(id = R.color.buttonBlue),

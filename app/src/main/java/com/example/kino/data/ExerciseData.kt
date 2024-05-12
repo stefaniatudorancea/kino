@@ -6,11 +6,11 @@ data class ExerciseDataDb(
     var id: String = "",
     var name: String = "",
     var description: String = "",
-    var videoUri: String? = null
+    var videoName: String? = null
 )
 
 data class ExerciseData(
     var name: String,
     var description: String,
-    var videoUri: Uri?
+    var videoName: String? = null
 )
