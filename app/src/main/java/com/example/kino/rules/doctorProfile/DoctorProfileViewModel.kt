@@ -135,27 +135,6 @@ class DoctorProfileViewModel: ViewModel() {
         }
     }
 
-//    fun getReviews() {
-//        viewModelScope.launch {
-//            val doctorId = _selectedDoctor.value?.uid ?: return@launch  // Asigură-te că avem un ID de doctor
-//
-//            try {
-//                val reviewsList = db.collection("doctors")
-//                    .document(doctorId)
-//                    .collection("reviews")
-//                    .get()
-//                    .await()
-//                    .mapNotNull { document ->
-//                        document.toObject(DoctorReview::class.java)
-//                    }
-//                _reviews.value = reviewsList
-//                sizeReviews.value = reviews.value.count()
-//            } catch (e: Exception) {
-//                Log.e("DoctorProfileViewModel", "Error fetching reviews", e)
-//            }
-//        }
-//    }
-
     fun fetchExercises(uidDoctor: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -266,19 +245,15 @@ class DoctorProfileViewModel: ViewModel() {
                 val conversationData = ChatData(conversationId, patientUid, doctorUid, null)
                 conversationsRef.setValue(conversationData).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Conversația a fost creată cu succes
                         //openChat(conversationId) // O funcție pentru a deschide interfața de chat
                     } else {
-                        // Tratează eroarea
                         println("Eroare la crearea conversației.")
                     }
                 }
             } else {
-                // Conversația există, deschidem chat-ul
                 //openChat(conversationId)
             }
         }.addOnFailureListener {
-            // Tratează erorile de ascultare
             println("Eroare la accesarea bazei de date.")
         }
     }
@@ -289,12 +264,10 @@ class DoctorProfileViewModel: ViewModel() {
         if (currentUser != null) {
             currentUser.update("currentConversation", conversationId)
                 .addOnSuccessListener {
-                    // Aici poți să tratezi cazul în care actualizarea a reușit
                     Log.d( "UpdateCurrentConversation", "Document successfully updatedddd!")
                     selectedDoctor.value?.let { it1 -> initiateChatWithDoctor(it1.uid) }
                 }
                 .addOnFailureListener { e ->
-                    // Aici poți să tratezi cazul în care actualizarea a eșuat
                     Log.w("UpdateCurrentConversation", "Error updating document", e)
                 }
         }
@@ -311,12 +284,10 @@ class DoctorProfileViewModel: ViewModel() {
                 _currentUserForDoctorList.value = userDataForDoctorList
                 _currentFavDoctor.value = currentUser.value?.favDoctor
             }.addOnFailureListener { e ->
-                // Handle the error
             }
         }
     }
 
-    //functia care se apeleaza initial
     fun addFavDoctor() {
         val currentUid = auth.currentUser?.uid
         val currentUser = currentUid?.let { db.collection(USER_NODE).document(it) }
@@ -325,7 +296,6 @@ class DoctorProfileViewModel: ViewModel() {
                 val currentValue = document.getString("favDoctor")
                 if (currentValue == "") {
                     assignFavDoctor()
-                    //removeFromPatientList()
                 } else {
                     showConfirmationDialog()
                 }

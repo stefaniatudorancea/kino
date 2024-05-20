@@ -11,6 +11,8 @@ import com.example.kino.data.DoctorData
 import com.example.kino.data.ExerciseDataDb
 import com.example.kino.data.RoutineDataDb
 import com.example.kino.data.RoutineExerciseData
+import com.example.kino.data.USER_NODE
+import com.example.kino.data.UserDataForDoctorList
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.example.kino.rules.login.LoginUIState
@@ -36,10 +38,23 @@ class RoutineViewModel: ViewModel() {
     private val _selectedRoutine = MutableLiveData<RoutineDataDb?>()
     val selectedRoutine: LiveData<RoutineDataDb?> = _selectedRoutine
 
+    private val _showAssignDialog = MutableStateFlow(false)
+    val showAssignDialog = _showAssignDialog.asStateFlow()
+
+    var fetchRoutinesProcess = mutableStateOf(false)
+
     init{
         if (currentDoctor != null) {
             fetchRoutines(currentDoctor)
         }
+    }
+
+    fun showAssignDialog() {
+        _showAssignDialog.value = true
+    }
+
+    fun dismissAssignDialog() {
+        _showAssignDialog.value = false
     }
 
     fun onEvent(event: RoutineUIEvent){
@@ -65,7 +80,6 @@ class RoutineViewModel: ViewModel() {
                 if (event.isChecked) {
                     routineUIState.value.exercises.add(RoutineExerciseData(event.exercise, 0, 0))
                 } else {
-                    // Îl elimină dacă este debifat
                     routineUIState.value.exercises.removeAll { it.exercise == event.exercise }
                 }
             }
@@ -75,7 +89,6 @@ class RoutineViewModel: ViewModel() {
                         exercise.series = event.series
                         exercise.repetitions = event.repetitions
                     } else {
-                        // Elimină exercițiul dacă detalii sunt invalide
                         routineUIState.value.exercises.remove(exercise)
                     }
                 }
@@ -93,6 +106,7 @@ class RoutineViewModel: ViewModel() {
             db.collection(DOCTOR_NODE).document(doctorUid)
                 .collection("routines").add(routineData)
                 .addOnSuccessListener { documentReference ->
+                    fetchRoutines(doctorUid)
                     PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen)
                     Log.d(TAG, "DocumentSnapshot written with ID: ${documentReference.id}")
                 }
@@ -102,31 +116,8 @@ class RoutineViewModel: ViewModel() {
         }
     }
 
-//    fun fetchRoutines(uidDoctor: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                val snapshot = db.collection("Doctor")
-//                    .document(uidDoctor)
-//                    .collection("routines")
-//                    .get()
-//                    .await()
-//                if (snapshot.isEmpty) {
-//                    Log.d(TAG, "No routines found")
-//                }
-//                val routinesList = snapshot.documents.mapNotNull { document ->
-//                    document.toObject(RoutineDataDb::class.java)?.apply {
-//                        id = document.id
-//                        Log.d(TAG, "Fetched routines: $this")
-//                    }
-//                }
-//                _routines.value = routinesList
-//                Log.d(TAG, "Routines loaded successfully")
-//            } catch (e: Exception) {
-//                Log.w(TAG, "Error fetching Routines", e)
-//            }
-//        }
-//    }
 fun fetchRoutines(uidDoctor: String) {
+    fetchRoutinesProcess.value = true
     viewModelScope.launch(Dispatchers.IO) {
         try {
             val docRef = db.collection("Doctor").document(uidDoctor)
@@ -173,6 +164,7 @@ fun fetchRoutines(uidDoctor: String) {
                         }
                     }
                     _routines.value = routinesList
+                    fetchRoutinesProcess.value = false
                     Log.d(TAG, "Routines loaded successfully with exercises")
                 } else {
                     Log.d(TAG, "No routines found")
@@ -192,4 +184,48 @@ fun fetchRoutines(uidDoctor: String) {
         _selectedRoutine.value = routine
         PostOfficeAppRouter.navigateTo(Screen.RoutineScreen)
     }
+
+    fun assignRoutineToPatient(patient: UserDataForDoctorList, routine: RoutineDataDb) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val userDocRef = db.collection(USER_NODE).document(patient.uid)
+                val assignedRoutinesRef = userDocRef.collection("assignedRoutines")
+                val modifiedExercises = routine.exercise.map { exercise ->
+                    mapOf(
+                        "id" to (exercise.exercise?.id ?: ""),
+                        "name" to (exercise.exercise?.name ?: ""),
+                        "description" to exercise.exercise?.description,
+                        "videoName" to exercise.exercise?.videoName,
+                        "repetitions" to exercise.repetitions,
+                        "series" to exercise.series,
+                        "done" to false
+                    )
+                }
+
+                val routineDetails = mapOf(
+                    "routineDetails" to mapOf(
+                        "id" to routine.id,
+                        "name" to routine.name,
+                        "disease" to routine.disease,
+                        "exercises" to modifiedExercises,
+                        "creationDate" to System.currentTimeMillis()
+                    ),
+                    "startDate" to System.currentTimeMillis(),
+                    "exercisesDone" to 0
+                )
+
+                assignedRoutinesRef.add(routineDetails).addOnSuccessListener { documentReference ->
+                    Log.d(TAG, "Routine successfully assigned to patient")
+                    userDocRef.update("currentRoutineId", documentReference.id)
+                }.addOnFailureListener { e ->
+                    Log.e(TAG, "Error assigning routine to patient", e)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception when trying to assign routine", e)
+            }
+        }
+    }
+
+
+
 }

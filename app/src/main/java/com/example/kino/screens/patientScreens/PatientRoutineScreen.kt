@@ -1,5 +1,6 @@
-package com.example.kino.screens.doctorScreens
+package com.example.kino.screens.patientScreens
 
+import PatientRoutineViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -25,21 +26,18 @@ import com.example.kino.components.AssignRoutineDialog
 import com.example.kino.components.BackButton
 import com.example.kino.components.ButtonComponent
 import com.example.kino.components.ExerciseDetailsCard
-import com.example.kino.components.RoutineItem
+import com.example.kino.components.SeePatientRoutineExerciseItem
 import com.example.kino.components.SeeRoutineExerciseItem
-import com.example.kino.navigation.PostOfficeAppRouter
-import com.example.kino.navigation.Screen
 import com.example.kino.rules.exercise.ExerciseViewModel
 import com.example.kino.rules.routine.RoutineViewModel
 
-
 @Composable
-fun RoutineScreen(routineViewModel: RoutineViewModel = viewModel(), exerciseViewModel: ExerciseViewModel = viewModel()){
-    val routine = routineViewModel.selectedRoutine.value
+fun PatientRoutineScreen(patientRoutineViewModel: PatientRoutineViewModel = viewModel()){
+    val routine = patientRoutineViewModel.currentRoutine.collectAsState().value
     Scaffold(
         topBar = {
             if (routine != null) {
-                AppToolbar(toolbarTitle = routine.name, isDoctor = true)
+                AppToolbar(toolbarTitle = routine.name, isDoctor = false)
             }
         },
     ){
@@ -52,31 +50,17 @@ fun RoutineScreen(routineViewModel: RoutineViewModel = viewModel(), exerciseView
                 .padding(paddingValues)
         ){
             Column {
-                AssignRoutineDialog()
                 BackButton()
                 ExerciseDetailsCard(label = stringResource(id = R.string.disease), routine?.disease)
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     if (routine != null) {
-                        items(routine.exercise) { ex ->
-                            SeeRoutineExerciseItem(ex,
-                                { ex.exercise?.let { exerciseViewModel.selectExercise(it) } })
+                        items(routine.exercises) { ex ->
+                            SeePatientRoutineExerciseItem(ex,
+                                { ex.let { patientRoutineViewModel.selectExercise(it) } })
                         }
                     }
                 }
-                ButtonComponent(
-                    value = stringResource(id = R.string.assign),
-                    onButtonClicked = { routineViewModel.showAssignDialog()
-                         },
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            colorResource(id = R.color.buttonBlue),
-                            colorResource(id = R.color.buttonBlue),
-                        )
-                    ),
-                    imageVector = null,
-                    isEnabled = true
-                )
-                Spacer(modifier = Modifier.height(20.dp))
+
             }
         }
     }

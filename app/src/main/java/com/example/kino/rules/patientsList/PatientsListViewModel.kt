@@ -3,6 +3,7 @@ package com.example.kino.rules.patientsList
 import android.content.ContentValues
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +33,7 @@ class PatientsListViewModel: ViewModel() {
 
     private val _patientsList = MutableStateFlow<List<UserDataForDoctorList>?>(null)
     val patientsList: StateFlow<List<UserDataForDoctorList>?> = _patientsList.asStateFlow()
+    var fetchPatiensProcess = mutableStateOf(false)
 
     fun onEvent(event: PatientsListUIEvent) {
         when (event) {
@@ -46,20 +48,17 @@ class PatientsListViewModel: ViewModel() {
     }
 
     fun loadPatientsForDoctor() {
+        fetchPatiensProcess.value = true
         viewModelScope.launch {
             val doctorId = auth.currentUser?.uid
             doctorId?.let { id ->
                 val docRef = db.collection(DOCTOR_NODE).document(id)
                 docRef.get().addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
-                        // Obținem lista de Maps care reprezintă pacienții.
                         val patientsListMap = documentSnapshot.get("patientsList") as? List<Map<String, Any>> ?: listOf()
-
-                        // Convertim fiecare Map într-o instanță de UserDataForDoctorList.
                         val patients = patientsListMap.mapNotNull { patientMap ->
                             try {
                                 val patientDetails = patientMap["value"] as Map<String, Any>
-                                // Utilizăm .map pentru a converti manual fiecare Map în UserDataForDoctorList.
                                 UserDataForDoctorList(
                                     uid = patientDetails["uid"] as? String ?: "",
                                     firstName = patientDetails["firstName"] as? String ?: "",
@@ -68,11 +67,12 @@ class PatientsListViewModel: ViewModel() {
                                 )
                             } catch (e: Exception) {
                                 Log.e(TAG, "Error converting patient data: $e")
-                                null // în caz de eroare la conversie, returnează null pentru acest element.
+                                null
                             }
                         }
 
                         _patientsList.value = patients
+                        fetchPatiensProcess.value = false
                     } else {
                         Log.d(TAG, "Document does not exist")
                         _patientsList.value = listOf()

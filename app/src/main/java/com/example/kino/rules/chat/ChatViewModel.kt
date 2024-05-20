@@ -46,6 +46,7 @@ class ChatViewModel: ViewModel() {
 
     private lateinit var messagesRef: DatabaseReference
     private var childEventListener: ChildEventListener? = null
+    var fetchChatProcess = mutableStateOf(false)
 
     fun onEvent(event: ChatUIEvent){
         when(event){
@@ -81,18 +82,16 @@ class ChatViewModel: ViewModel() {
         val database = FirebaseDatabase.getInstance().reference
         val messagesRef = database.child("conversations").child(chatId).child("messages")
 
-        val messageId = messagesRef.push().key // Generează un nou ID unic pentru mesaj
-        val timestamp = System.currentTimeMillis().toString() // Timestamp pentru mesaj
+        val messageId = messagesRef.push().key
+        val timestamp = System.currentTimeMillis().toString()
 
         if (messageId != null ) {
             val message = Message(messageId, senderId, messageText, timestamp)
             messagesRef.child(messageId).setValue(message).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Mesajul a fost trimis cu succes
                     Log.d("sendMessage", "Mesaj trimis cu succes.")
                     updateLastMessage(chatId, message)
                 } else {
-                    // Tratarea erorii de trimitere a mesajului
                     Log.e("sendMessage", "Eroare la trimiterea mesajului.")
                 }
             }
@@ -113,7 +112,7 @@ class ChatViewModel: ViewModel() {
     private fun setupMessageListener() {
         // Înlăturăm vechiul listener, indiferent dacă este sau nu `null`
         childEventListener?.let { messagesRef?.removeEventListener(it) }
-
+        fetchChatProcess.value = true
         _currentConversation.value?.let { conversationId ->
             messagesRef = FirebaseDatabase.getInstance().reference.child("conversations").child(conversationId).child("messages")
 
@@ -124,6 +123,7 @@ class ChatViewModel: ViewModel() {
                             add(message)
                         }.sortedBy { it.timestamp }
                         _messages.value = updatedMessages
+                        fetchChatProcess.value = false
                     }
                 }
 
@@ -140,7 +140,6 @@ class ChatViewModel: ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        // Îndepărtăm listener-ul atunci când ViewModel-ul este distrus
         messagesRef?.removeEventListener(childEventListener!!)
     }
 
@@ -156,16 +155,11 @@ class ChatViewModel: ViewModel() {
     }
 
     private fun resetMessagesAndSetupListener() {
-        // Îndepărtăm listener-ul vechi
         childEventListener?.let { listener ->
             messagesRef.removeEventListener(listener)
-            childEventListener = null // Resetăm listener-ul
+            childEventListener = null
         }
-
-        // Resetăm lista de mesaje
         _messages.value = emptyList()
-
-        // Setup-ul noului listener pentru noua conversație
         setupMessageListener()
     }
 

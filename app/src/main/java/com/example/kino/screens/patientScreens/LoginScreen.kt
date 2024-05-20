@@ -110,11 +110,4 @@ fun LoginScreen(loginViewModel: LoginViewModel = viewModel()) {
         }
 
     }
-
-}
-
-@Preview
-@Composable
-fun LoginScreenPreview() {
-    //LoginScreen()
 }

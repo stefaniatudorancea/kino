@@ -104,7 +104,6 @@ fun MyTextFieldComponent(
             }
             onTextSelected(newValue)
         },
-        //keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         singleLine = true,
         maxLines= 1,
         leadingIcon = {
@@ -145,7 +144,6 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onT
         trailingIcon = {
             val iconImage = if (passwordVisibile.value) {
                 Icons.Filled.Visibility
-                //painterResource(id = R.drawable.eye)
             } else {
                 Icons.Filled.VisibilityOff
             }
@@ -357,7 +355,6 @@ fun BackButton() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            //.padding(horizontal = 0.dp, vertical = 10.dp)
             .padding(top = 0.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically

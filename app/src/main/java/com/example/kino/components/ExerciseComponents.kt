@@ -108,7 +108,7 @@ fun ExerciseItem(exercise: ExerciseDataDb, onCardClicked: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 10.dp, horizontal = 25.dp)
             .clickable(onClick = onCardClicked),
         colors = CardDefaults.cardColors(colorResource(id = R.color.cardBlue))
     ) {

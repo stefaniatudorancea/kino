@@ -1,5 +1,6 @@
-package com.example.kino.screens.doctorScreens
+package com.example.kino.screens.patientScreens
 
+import PatientRoutineViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,18 +19,18 @@ import com.example.kino.components.AppToolbar
 import com.example.kino.components.BackButton
 import com.example.kino.components.ExerciseDetailsCard
 import com.example.kino.components.SeeVideoPlayer
-import com.example.kino.rules.exercise.ExerciseViewModel
+import com.example.kino.navigation.Screen
 
 @Composable
-fun ExerciseScreen(exerciseViewModel: ExerciseViewModel = viewModel()){
-    val exercise = exerciseViewModel.selectedExercise.value
+fun PatientExerciseScreen(patientRoutineViewModel: PatientRoutineViewModel = viewModel()){
+    val exercise = patientRoutineViewModel.selectedExercise.value
     if (exercise != null) {
-        exercise.videoName?.let { exerciseViewModel.fetchVideoUrl(it) }
+        exercise.videoName?.let { patientRoutineViewModel.fetchVideoUrl(it) }
     }
     Scaffold(
         topBar = {
             if (exercise != null) {
-                AppToolbar(toolbarTitle = exercise.name, isDoctor = true)
+                AppToolbar(toolbarTitle = exercise.name, isDoctor = false)
             }
         },
     ){
@@ -50,7 +51,7 @@ fun ExerciseScreen(exerciseViewModel: ExerciseViewModel = viewModel()){
                                 label = stringResource(id = R.string.exercise_description),
                                 value = exercise.description
                             )
-                            exerciseViewModel.videoUrl.value?.let {
+                            patientRoutineViewModel.videoUrl.value?.let {
                                 SeeVideoPlayer(it)
                             }
                         }

@@ -62,7 +62,7 @@ fun CreateRoutineScreen( exerciseViewModel: ExerciseViewModel = viewModel(), rou
                    fieldForNumbers = false
                )
                Spacer(modifier = Modifier.width(10.dp))
-               LazyColumn(modifier = Modifier.weight(1f)) {
+               LazyColumn(modifier = Modifier.weight(1f).padding(vertical = 10.dp)) {
                    items(exercises) { exercise ->
                        RoutineExerciseItem(exercise)
                    }

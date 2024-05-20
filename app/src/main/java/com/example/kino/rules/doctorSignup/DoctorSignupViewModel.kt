@@ -195,7 +195,6 @@ class DoctorSignupViewModel: ViewModel() {
                 _imageUrl.value = uri.toString()
             }
         }.addOnFailureListener {
-            //exception -> {onEvent(exception)}
         }
     }
     fun setImageUri(uri: Uri?) {
@@ -217,10 +216,8 @@ class DoctorSignupViewModel: ViewModel() {
             .addOnCompleteListener { task ->
                 signUpInProgress.value = false
                 if (task.isSuccessful) {
-                    // Acum că utilizatorul este creat, obține uid-ul acestuia.
                     val currentUser = FirebaseAuth.getInstance().currentUser
                     currentUser?.let { user ->
-                        // Apoi adaugă detaliile utilizatorului în Firestore.
                         addUserDetailsInDatabase(
                             uid = user.uid,
                             firstName = registartionUIState.value.firstName,

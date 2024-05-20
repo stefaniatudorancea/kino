@@ -1,12 +1,8 @@
 package com.example.kino.rules.exercise
 
-import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +10,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.kino.data.DOCTOR_NODE
 import com.example.kino.data.ExerciseData
 import com.example.kino.data.ExerciseDataDb
-import com.example.kino.data.RoutineDataDb
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -25,12 +20,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import kotlin.random.Random
 
 class ExerciseViewModel: ViewModel() {
     private val db = FirebaseFirestore.getInstance()
     private val currentDoctor = FirebaseAuth.getInstance().currentUser?.uid
-    private val TAG = ExerciseViewModel::class.simpleName
+    val TAG = ExerciseViewModel::class.simpleName
     var createExerciseUIState = mutableStateOf(ExerciseUIState())
     private val storageReference = FirebaseStorage.getInstance().reference
     private var createInProgress = mutableStateOf(false)
@@ -76,7 +70,7 @@ class ExerciseViewModel: ViewModel() {
         }
     }
 
-    fun addExercise(uidDoctor: String) {
+    private fun addExercise(uidDoctor: String) {
         viewModelScope.launch {
             val state = createExerciseUIState.value
                 val exerciseData = ExerciseData(
@@ -105,18 +99,15 @@ class ExerciseViewModel: ViewModel() {
         videoRef.downloadUrl.addOnSuccessListener { uri ->
             if (uri != null) {
                 _videoUrl.value = uri.toString()
-                Log.w("ExerciseViewModel", "video url is ${videoUrl.value}")
             } else {
-                Log.w("ExerciseViewModel", "Received null URI for video")
                 _videoUrl.value = "Default or error URL here"
             }
         }.addOnFailureListener {
-            Log.w("ExerciseViewModel", "Error fetching video URL", it)
-            _videoUrl.value = "Default or error URL here"  // Set a default or error value in case of failure
+            _videoUrl.value = "Default or error URL here"
         }
     }
 
-    fun fetchExercises(uidDoctor: String) {
+    private fun fetchExercises(uidDoctor: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val snapshot = db.collection("Doctor")
@@ -129,7 +120,7 @@ class ExerciseViewModel: ViewModel() {
                 }
                 val exercisesList = snapshot.documents.mapNotNull { document ->
                     document.toObject(ExerciseDataDb::class.java)?.apply {
-                        id = document.id // Aici setăm ID-ul documentului ca ID în obiectul ExerciseData
+                        id = document.id
                         Log.d(TAG, "Fetched exercise: $this")
                     }
                 }
@@ -147,7 +138,7 @@ class ExerciseViewModel: ViewModel() {
         PostOfficeAppRouter.navigateTo(Screen.ExerciseScreen)
     }
 
-    fun getVideoUrlFromFirebaseStorage(fileName: String, onComplete: (String?) -> Unit) {
+    private fun getVideoUrlFromFirebaseStorage(fileName: String, onComplete: (String?) -> Unit) {
         val storageRef = FirebaseStorage.getInstance().reference.child("videos/$fileName")
         storageRef.downloadUrl.addOnSuccessListener { uri ->
             onComplete(uri.toString())
@@ -156,13 +147,13 @@ class ExerciseViewModel: ViewModel() {
         }
     }
 
-    fun loadVideoUrl(fileName: String) {
+    private fun loadVideoUrl(fileName: String) {
         getVideoUrlFromFirebaseStorage(fileName) { url ->
             _videoUrl.postValue(url)
         }
     }
 
-    fun clearExerciseCreationState() {
+    private fun clearExerciseCreationState() {
         createExerciseUIState.value = ExerciseUIState()
         _videoUrl.postValue(null)
     }

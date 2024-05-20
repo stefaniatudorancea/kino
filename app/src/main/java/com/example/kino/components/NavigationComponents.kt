@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Text
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -63,6 +66,18 @@ fun AppToolbar(toolbarTitle: String, isDoctor: Boolean, chatScreen: Boolean = fa
                     text = toolbarTitle,
                     color = Color.White
                 )
+            }
+        },
+        actions = {
+            // Adăugăm iconița de profil doar când isDoctor este false
+            if (!isDoctor) {
+                IconButton(onClick = { PostOfficeAppRouter.navigateTo(Screen.ProfileScreen) }) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle, // Presupunând că folosești iconița de profil standard
+                        contentDescription = "Profile",
+                        tint = Color.White
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(

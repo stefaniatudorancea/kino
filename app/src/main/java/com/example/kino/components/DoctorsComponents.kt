@@ -75,7 +75,6 @@ fun DoctorCard(doctorsViewModel: DoctorProfileViewModel = viewModel(), user: Doc
             .padding(8.dp)
             .fillMaxWidth()
             .height(80.dp)
-            //.border(2.dp, RoundedCornerShape(8.dp)), // Portocaliu și colțuri rotunjite
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -100,7 +99,7 @@ fun ImageForCard(imageUrl: String?) {
         val painter = if (!imageUrl.isNullOrEmpty()) {
             rememberImagePainter(data = imageUrl)
         } else {
-            painterResource(id = R.drawable.default_profile) // O imagine default din resurse
+            painterResource(id = R.drawable.default_profile)
         }
     Box(
         contentAlignment = Alignment.Center,
@@ -157,7 +156,6 @@ fun AddReviewDialog(doctorViewModel: DoctorProfileViewModel = viewModel(), onTex
                     .clip(componentShapes.small),
                 shape = RoundedCornerShape(50),
                 value = textValue,
-                //label = { Text(text = labelValue) },
                 onValueChange = { it: String ->
                   textValue = it
                     onTextSelected(it)
@@ -255,9 +253,9 @@ fun ReviewList(reviews: List<DoctorReview>, doctorProfileViewModel: DoctorProfil
 }
 
 fun convertTimestampToDate(timestamp: Long): String {
-    val date = Date(timestamp)  // Converteste timestamp-ul într-un obiect Date
-    val format = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())  // Defineste formatul datei
-    return format.format(date)  // Returnează data formatată ca String
+    val date = Date(timestamp)
+    val format = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
+    return format.format(date)
 }
 
 
