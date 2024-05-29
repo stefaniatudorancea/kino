@@ -38,12 +38,12 @@ class NavigationViewModel: ViewModel() {
         ),
         NavigationItem(
             index = 2,
-            titile = "Profile",
-            selectedIcon = Icons.Filled.Person,
-            unselectedIcon = Icons.Outlined.Person,
+            titile = "Routine",
+            selectedIcon = Icons.Filled.SportsGymnastics,
+            unselectedIcon = Icons.Outlined.SportsGymnastics,
             hasNews = false,
             badgeCount = null,
-            destination = Screen.ProfileScreen
+            destination = Screen.PatientRoutineScreen
         ),
     )
 
@@ -85,8 +85,8 @@ class NavigationViewModel: ViewModel() {
             is NavigationUIEvent.ChatsButtonClicked -> {
                 PostOfficeAppRouter.navigateTo(Screen.ChatsScreen)
             }
-            is NavigationUIEvent.ProfileButtonClicked -> {
-                PostOfficeAppRouter.navigateTo(Screen.ProfileScreen)
+            is NavigationUIEvent.RoutinePatientButtonClicked -> {
+                PostOfficeAppRouter.navigateTo(Screen.PatientRoutineScreen)
             }
             is NavigationUIEvent.PatientsListButtonClicked -> {
                 PostOfficeAppRouter.navigateTo(Screen.PatientsListScreen)

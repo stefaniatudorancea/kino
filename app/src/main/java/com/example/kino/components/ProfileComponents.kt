@@ -25,14 +25,20 @@ import coil.compose.rememberImagePainter
 import com.example.kino.R
 
 @Composable
-fun ProfileImage(imageUrl: String?){
-    val painter = if (imageUrl != null) rememberImagePainter(imageUrl) else painterResource(id = R.drawable.default_profile)
+fun ProfileImage(imageUrl: String?) {
+    val painter = if (imageUrl != null) rememberImagePainter(imageUrl) {
+        error(R.drawable.default_profile)  // Specifică o imagine implicită în caz de eroare
+        placeholder(R.drawable.default_profile)  // Imaginea afișată în timpul încărcării
+    } else {
+        painterResource(id = R.drawable.default_profile)
+    }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(130.dp)
             .clip(CircleShape),
-    ){
+    ) {
         Image(
             painter = painter,
             contentDescription = "Profile Image",
@@ -43,6 +49,7 @@ fun ProfileImage(imageUrl: String?){
         )
     }
 }
+
 @Composable
 fun UserDetailsCard(label: String, value: String?) {
     Card(

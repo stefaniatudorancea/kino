@@ -38,7 +38,6 @@ import com.example.kino.rules.chat.ChatUIEvent
 import com.example.kino.rules.chat.ChatViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChatsScreen(navigationViewModel: NavigationViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel(), patientRoutineViewModel: PatientRoutineViewModel = viewModel()) {
@@ -64,7 +63,6 @@ fun ChatsScreen(navigationViewModel: NavigationViewModel = viewModel(), chatView
                 val messages = chatViewModel.messages.collectAsState().value
                 val scrollState = rememberLazyListState()
                 val routine = patientRoutineViewModel.currentRoutine.collectAsState().value
-                val n = routine?.exercises?.size
 
                 LazyColumn(state = scrollState, modifier = Modifier.padding(bottom = 90.dp)) {
                     item {
@@ -72,7 +70,6 @@ fun ChatsScreen(navigationViewModel: NavigationViewModel = viewModel(), chatView
                             RoutineCard(routineName = it.name, numberOfDoneExercises = it.exercisesDone, numberOfExercises = it.exercises.size, onStart = {
                                 PostOfficeAppRouter.navigateTo(Screen.PatientRoutineScreen)
                             })
-
                         }
                     }
                     items(messages) { message ->

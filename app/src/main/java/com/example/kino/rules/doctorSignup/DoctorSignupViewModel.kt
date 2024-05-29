@@ -31,6 +31,9 @@ class DoctorSignupViewModel: ViewModel() {
     private val _imageUrl = MutableLiveData<String?>()
     val imageUrl: LiveData<String?> = _imageUrl
 
+    private val _imageName = MutableLiveData<String?>()
+    val imageName: LiveData<String?> = _imageName
+
     fun onEvent(event: DoctorSignupUIEvent){
         when(event){
             is DoctorSignupUIEvent.PhotoChanged -> {
@@ -188,15 +191,24 @@ class DoctorSignupViewModel: ViewModel() {
             secondValidationsPassed.value = false
         }
     }
-    private fun uploadImageToFirebaseStorage(imageUri: Uri) {
-        val storageRef = FirebaseStorage.getInstance().reference.child("images/${UUID.randomUUID()}.jpg")
-        storageRef.putFile(imageUri).addOnSuccessListener { taskSnapshot ->
-            taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
-                _imageUrl.value = uri.toString()
+    fun uploadImageToFirebaseStorage(imageUri: Uri) {
+        val fileName = "images/${UUID.randomUUID()}.jpg"  // Generăm numele fișierului
+        val storageRef = FirebaseStorage.getInstance().reference.child(fileName)
+        storageRef.putFile(imageUri).continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
             }
+            storageRef.downloadUrl  // Solicităm URL-ul după încărcare
+        }.addOnSuccessListener { uri ->
+            val imageUrl = uri.toString()
+            _imageName.value = imageUrl  // Salvăm URL-ul complet
         }.addOnFailureListener {
+            // Tratați cazurile de eroare, cum ar fi revenirea la o valoare implicită sau gestionarea erorilor
         }
     }
+
     fun setImageUri(uri: Uri?) {
         _imageUri.value = uri
         uri?.let { uploadImageToFirebaseStorage(it) }
@@ -223,7 +235,7 @@ class DoctorSignupViewModel: ViewModel() {
                             firstName = registartionUIState.value.firstName,
                             lastName = registartionUIState.value.lastName,
                             email = registartionUIState.value.email,
-                            imageUrl = this.imageUrl.value,
+                            imageUrl = this.imageName.value,
                             phoneNumber = registartionUIState.value.phoneNumber,
                             yearsOfExperience = registartionUIState.value.yearsOfExperience,
                             workplace = registartionUIState.value.workplace,

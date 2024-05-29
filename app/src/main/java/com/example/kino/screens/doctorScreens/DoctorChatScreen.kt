@@ -1,9 +1,12 @@
 package com.example.kino.screens.doctorScreens
 
 import android.os.Build
+import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.viewModelScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -25,24 +29,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import com.example.kino.R
+import com.example.kino.app.EventBus
 import com.example.kino.app.PostOfficeApp
 import com.example.kino.components.AppToolbar
 import com.example.kino.components.BackButton
 import com.example.kino.components.ButtonComponent
 import com.example.kino.components.ChatTextField
+import com.example.kino.components.ClickableFeedbackTextComponent
+import com.example.kino.components.ClickableReviewTextComponent
+import com.example.kino.components.FeedbackRoutineDialog
+import com.example.kino.components.FeedbackRoutineList
 import com.example.kino.components.ReceivedMessage
+import com.example.kino.components.RoutineDoctorCard
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.example.kino.rules.chat.ChatUIEvent
 import com.example.kino.rules.chat.ChatViewModel
+import com.example.kino.rules.doctorProfile.DoctorProfileUIEvent
+import com.example.kino.rules.feedbackRoutine.FeedbackRoutineUIEvent
+import com.example.kino.rules.feedbackRoutine.FeedbackRoutineViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(UnstableApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DoctorChatScreen(navigationViewModel: NavigationViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel()){
+fun DoctorChatScreen(feedbackRoutineViewModel: FeedbackRoutineViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel()){
     val conversationPartener = chatViewModel.conversationPartener.value
+    val routineAssignated = feedbackRoutineViewModel.currentRoutine.collectAsState().value
+
     Scaffold(
         topBar = {
             AppToolbar(
@@ -64,6 +84,8 @@ fun DoctorChatScreen(navigationViewModel: NavigationViewModel = viewModel(), cha
             Column(modifier = Modifier.fillMaxSize()) {
                 val messages = chatViewModel.messages.collectAsState().value
                 val scrollState = rememberLazyListState()
+                val viewFeedbackDialog = feedbackRoutineViewModel.showFeedbackDialog.collectAsState().value
+                val feedbacks = feedbackRoutineViewModel.routineFeedbacks.value
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -74,27 +96,43 @@ fun DoctorChatScreen(navigationViewModel: NavigationViewModel = viewModel(), cha
                 ){
                     BackButton()
                 }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        //.padding(horizontal = 0.dp, vertical = 10.dp)
-                        .padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    ButtonComponent(
-                        value = stringResource(id = R.string.assign_a_routine),
-                        onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen) },
-                        brush = Brush.horizontalGradient(
-                            listOf(
-                                colorResource(id = R.color.buttonBlue),
-                                colorResource(id = R.color.buttonBlue),
-                            )
-                        ),
-                        imageVector = null,
-                        isEnabled = true
+                feedbacks?.let {
+                    ClickableFeedbackTextComponent(
+                        onTextSelected = {
+                            feedbackRoutineViewModel.onEvent(FeedbackRoutineUIEvent.SeeFeedbacksClicked)
+                        }
                     )
+                    FeedbackRoutineDialog(feedbacks, viewFeedbackDialog,
+                        { feedbackRoutineViewModel.dismissFeedbackDialog() })
                 }
+                if(feedbackRoutineViewModel.isRoutineAssignet.collectAsState().value){
+                    if (routineAssignated != null) {
+                        RoutineDoctorCard(routineAssignated.name, routineAssignated.exercisesDone, routineAssignated.exercises.size)
+                    }
+                }else{
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            //.padding(horizontal = 0.dp, vertical = 10.dp)
+                            .padding(bottom = 10.dp),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ButtonComponent(
+                            value = stringResource(id = R.string.assign_a_routine),
+                            onButtonClicked = { PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen) },
+                            brush = Brush.horizontalGradient(
+                                listOf(
+                                    colorResource(id = R.color.buttonBlue),
+                                    colorResource(id = R.color.buttonBlue),
+                                )
+                            ),
+                            imageVector = null,
+                            isEnabled = true
+                        )
+                    }
+                }
+
                 LazyColumn(
                     state = scrollState,
                     modifier = Modifier
@@ -121,6 +159,15 @@ fun DoctorChatScreen(navigationViewModel: NavigationViewModel = viewModel(), cha
                         isEnabled = true
                     )
                     Spacer(modifier = Modifier.width(10.dp))
+                }
+            }
+
+            if(chatViewModel.fetchChatProcess.value){
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ){
+                    CircularProgressIndicator()
                 }
             }
         }

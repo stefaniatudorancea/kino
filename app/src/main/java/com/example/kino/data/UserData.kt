@@ -19,3 +19,8 @@ data class UserDataForDoctorList(
 ) {
 
 }
+
+data class FeedbackData(
+    var feedback: String = "",
+    var exerciseName: String = ""
+)

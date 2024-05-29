@@ -42,8 +42,7 @@ import com.example.kino.rules.signup.SignupUIEvent
 fun SignUpScreen(signupViewModel: SignupViewModel = viewModel()) {
     val imageUri by signupViewModel.imageUri.observeAsState()
     val imageUrl by signupViewModel.imageUrl.observeAsState()
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
+    val imagePickerLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             signupViewModel.setImageUri(uri)
         }

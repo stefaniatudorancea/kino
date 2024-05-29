@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -27,18 +31,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.kino.R
 import com.example.kino.data.ExerciseDataDb
+import com.example.kino.rules.exercise.ExerciseViewModel
+import com.example.kino.rules.routine.RoutineViewModel
 
 @Composable
 fun VideoPlayer(uri: String) {
@@ -166,7 +174,7 @@ fun ExerciseDetailsCard(label: String, value: String?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp)
+            .padding(vertical = 5.dp, horizontal = 50.dp)
             .border(2.dp, Color.Gray, RoundedCornerShape(30.dp)),
         shape = RoundedCornerShape(30),
         colors = CardDefaults.cardColors(colorResource(id = R.color.white))
@@ -176,6 +184,39 @@ fun ExerciseDetailsCard(label: String, value: String?) {
             Text(text = "$value", style = MaterialTheme.typography.bodyLarge)
 
         }
+    }
+}
+
+@Composable
+fun DeleteExerciseDialog(exerciseViewModel: ExerciseViewModel = viewModel()) {
+    val showDialog = exerciseViewModel.showDeleteExerciseDialog.collectAsState()
+    val routine = exerciseViewModel.selectedExercise.value
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { exerciseViewModel.dismissDeleteExerciseDialog() },
+            text = { Text(stringResource(id = R.string.delete_exercise)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (routine != null) {
+                            exerciseViewModel.deleteExercise(routine)
+                            exerciseViewModel.dismissDeleteExerciseDialog()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.buttonBlue))
+                ) {
+                    Text(stringResource(id = R.string.yes))
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { exerciseViewModel.dismissDeleteExerciseDialog() },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.buttonBlue))
+                ) {
+                    Text(stringResource(id = R.string.no))
+                }
+            }
+        )
     }
 }
 

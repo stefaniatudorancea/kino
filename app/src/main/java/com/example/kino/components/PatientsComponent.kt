@@ -26,10 +26,11 @@ import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.example.kino.rules.chat.ChatViewModel
 import com.example.kino.rules.doctorProfile.DoctorProfileViewModel
+import com.example.kino.rules.feedbackRoutine.FeedbackRoutineViewModel
 import com.example.kino.rules.patientsList.PatientsListViewModel
 
 @Composable
-fun PatientCard(chatViewModel: ChatViewModel = viewModel(), user: UserDataForDoctorList) {
+fun PatientCard(chatViewModel: ChatViewModel = viewModel(), user: UserDataForDoctorList, feedbackRoutineViewModel: FeedbackRoutineViewModel = viewModel()) {
     Card(
         colors = CardDefaults.cardColors(colorResource(id = R.color.listBlue)),
         modifier = Modifier
@@ -51,6 +52,7 @@ fun PatientCard(chatViewModel: ChatViewModel = viewModel(), user: UserDataForDoc
             IconButton(onClick = {
                 chatViewModel.getCurrentConversation(user.uid)
                 chatViewModel.updateConversationPartener(user)
+                feedbackRoutineViewModel.selectPatient(user.uid)
                 PostOfficeAppRouter.navigateTo(Screen.DoctorChatScreen)
             }) {
                 Icon(painter = painterResource(id = R.drawable.more_details), contentDescription = "details")

@@ -51,8 +51,6 @@ fun PatientsListScreen(navigationViewModel: NavigationViewModel = viewModel(), p
                     items(list) { patient ->
                         PatientCard(user = patient)
                     }
-                } ?: item {
-                    Text("Niciun pacient disponibil")
                 }
             }
         }

@@ -35,8 +35,13 @@ class ExerciseViewModel: ViewModel() {
     private val _selectedExercise = MutableLiveData<ExerciseDataDb?>()
     val selectedExercise: LiveData<ExerciseDataDb?> = _selectedExercise
 
+    private val _showDeleteExerciseDialog = MutableStateFlow(false)
+    val showDeleteExerciseDialog = _showDeleteExerciseDialog.asStateFlow()
+
     private val _videoUrl = MutableLiveData<String?>()
     val videoUrl: LiveData<String?> = _videoUrl
+
+    private val videoUrlCache = mutableMapOf<String, String>()
 
     init {
         fetchExercises(currentDoctor.toString())
@@ -70,6 +75,14 @@ class ExerciseViewModel: ViewModel() {
         }
     }
 
+    fun showDeleteExerciseDialog() {
+        _showDeleteExerciseDialog.value = true
+    }
+
+    fun dismissDeleteExerciseDialog() {
+        _showDeleteExerciseDialog.value = false
+    }
+
     private fun addExercise(uidDoctor: String) {
         viewModelScope.launch {
             val state = createExerciseUIState.value
@@ -95,10 +108,17 @@ class ExerciseViewModel: ViewModel() {
     }
 
     fun fetchVideoUrl(videoName: String) {
+        videoUrlCache[videoName]?.let {
+            _videoUrl.value = it
+            return
+        }
+
+        // Dacă URL-ul nu este în cache, solicităm de la Firebase
         val videoRef = storageReference.child("videos/$videoName")
         videoRef.downloadUrl.addOnSuccessListener { uri ->
             if (uri != null) {
                 _videoUrl.value = uri.toString()
+                videoUrlCache[videoName] = uri.toString()  // Adăugăm URL-ul în cache
             } else {
                 _videoUrl.value = "Default or error URL here"
             }
@@ -134,7 +154,7 @@ class ExerciseViewModel: ViewModel() {
 
     fun selectExercise(exercise: ExerciseDataDb){
         _selectedExercise.value = exercise
-        exercise.videoName?.let { loadVideoUrl(it) }
+        exercise.videoName?.let { fetchVideoUrl(it) }
         PostOfficeAppRouter.navigateTo(Screen.ExerciseScreen)
     }
 
@@ -152,6 +172,36 @@ class ExerciseViewModel: ViewModel() {
             _videoUrl.postValue(url)
         }
     }
+
+    fun deleteExercise(exercise: ExerciseDataDb) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                if (exercise.id.isNotEmpty()) {
+                    db.collection("Doctor").document(currentDoctor!!)
+                        .collection("exercises").document(exercise.id)
+                        .delete()
+                        .await()
+                    Log.d(TAG, "Exercise successfully deleted")
+
+                    if (exercise.videoName?.isNotEmpty() == true) {
+                        val videoRef = storageReference.child("videos/${exercise.videoName}")
+                        videoRef.delete().addOnSuccessListener {
+                            Log.d(TAG, "Video successfully deleted")
+                        }.addOnFailureListener { e ->
+                            Log.e(TAG, "Error deleting video", e)
+                        }
+                    }
+
+                    fetchExercises(currentDoctor!!)
+                    PostOfficeAppRouter.navigateTo(Screen.ExercisesListScreen)
+
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error deleting exercise", e)
+            }
+        }
+    }
+
 
     private fun clearExerciseCreationState() {
         createExerciseUIState.value = ExerciseUIState()

@@ -16,6 +16,7 @@ data class RoutinePatientData(
     val disease: String?,
     val exercises: MutableList<RoutinePatientExerciseData>,
     val startDate: Long,
-    val exercisesDone: Int,
-    val creationDate: String
+    val exercisesDone: Long,
+    val creationDate: String,
+    val doctorUid: String
 )

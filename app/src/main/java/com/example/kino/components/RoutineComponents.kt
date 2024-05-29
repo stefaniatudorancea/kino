@@ -229,7 +229,7 @@ fun SeeRoutineExerciseItem(ex: RoutineExerciseData, onCardClicked: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 8.dp, horizontal = 40.dp)
             .clickable(onClick = onCardClicked),
         colors = CardDefaults.cardColors(colorResource(id = R.color.cardBlue))
     ) {
@@ -268,12 +268,45 @@ fun SeeRoutineExerciseItem(ex: RoutineExerciseData, onCardClicked: () -> Unit) {
 }
 
 @Composable
+fun DeleteRoutineDialog(routineViewModel: RoutineViewModel = viewModel()) {
+    val showDialog = routineViewModel.showDeleteRoutineDialog.collectAsState()
+    val routine = routineViewModel.selectedRoutine.value
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { routineViewModel.dismissDeleteRoutineDialog() },
+            text = { Text(stringResource(id = R.string.delete_routine)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (routine != null) {
+                            routineViewModel.deleteRoutine(routine)
+                            routineViewModel.dismissDeleteRoutineDialog()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.buttonBlue))
+                ) {
+                    Text(stringResource(id = R.string.yes))
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { routineViewModel.dismissDeleteRoutineDialog()},
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.buttonBlue))
+                ) {
+                    Text(stringResource(id = R.string.no))
+                }
+            }
+        )
+    }
+}
+
+@Composable
 fun AssignRoutineDialog(routineViewModel: RoutineViewModel = viewModel(), patientsListViewModel: PatientsListViewModel = viewModel()) {
     val showAssignDialog = routineViewModel.showAssignDialog.collectAsState()
     val patients = patientsListViewModel.patientsList.collectAsState().value
     var expanded by remember { mutableStateOf(false) }
     var selectedPatient by remember { mutableStateOf<UserDataForDoctorList?>(null) }
-    val textFieldValue = remember(selectedPatient) { mutableStateOf(selectedPatient?.firstName ?: "Selectează pacient") }
+    val textFieldValue = remember(selectedPatient) { mutableStateOf(selectedPatient?.firstName ?: "Select patient") }
 
     if (showAssignDialog.value) {
         AlertDialog(
@@ -283,8 +316,8 @@ fun AssignRoutineDialog(routineViewModel: RoutineViewModel = viewModel(), patien
                 Box(modifier = Modifier.fillMaxWidth()) {
                     TextField(
                         value = textFieldValue.value,
-                        onValueChange = { /* Nu modificăm valoarea textului aici */ },
-                        readOnly = true,  // Facem TextField-ul să fie doar pentru citire
+                        onValueChange = {  },
+                        readOnly = true,
                         trailingIcon = {
                             IconButton(onClick = { expanded = true }) {
                                 Icon(
@@ -307,14 +340,14 @@ fun AssignRoutineDialog(routineViewModel: RoutineViewModel = viewModel(), patien
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .width(200.dp)
-                            .align(Alignment.TopCenter) // Alinează DropdownMenu cu TextField
+                            .align(Alignment.TopCenter)
                     ) {
                         patients?.forEach { patient ->
                             DropdownMenuItem(
                                 text = {Text(patient.firstName)},
                                 onClick = {
                                     selectedPatient = patient
-                                    textFieldValue.value = patient.firstName  // Actualizăm TextField-ul cu numele pacientului selectat
+                                    textFieldValue.value = patient.firstName
                                     expanded = false
                                 }
                             ) 

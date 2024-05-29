@@ -30,6 +30,9 @@ class SignupViewModel : ViewModel() {
     private val _imageUri = MutableLiveData<Uri?>()
     val imageUri: LiveData<Uri?> = _imageUri
 
+    private val _imageName = MutableLiveData<String>()
+    val imageName: LiveData<String?> = _imageName
+
     private val _imageUrl = MutableLiveData<String?>()
     val imageUrl: LiveData<String?> = _imageUrl
     fun onEvent(event: SignupUIEvent) {
@@ -151,7 +154,7 @@ class SignupViewModel : ViewModel() {
                         firstName = registartionUIState.value.firstName,
                         lastName = registartionUIState.value.lastName,
                         email = registartionUIState.value.email,
-                        imageUrl = this.imageUrl.value
+                        imageUrl = this.imageName.value
                     )
                     PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
                 }
@@ -168,7 +171,7 @@ class SignupViewModel : ViewModel() {
         var currentUid = FirebaseAuth.getInstance().currentUser?.uid
 
         if (currentUid != null) {
-            val userData = UserData(uid = currentUid, firstName = firstName, lastName = lastName, email = email, imageUrl = imageUrl, favDoctor = "")
+            val userData = UserData(uid = currentUid, firstName = firstName, lastName = lastName, email = email, imageUrl = imageName.value, favDoctor = "")
             val db = FirebaseFirestore.getInstance()
 
             db.collection(USER_NODE).document(userData.uid)
@@ -185,15 +188,23 @@ class SignupViewModel : ViewModel() {
         }
 
     fun uploadImageToFirebaseStorage(imageUri: Uri) {
-        val storageRef = FirebaseStorage.getInstance().reference.child("images/${UUID.randomUUID()}.jpg")
-        storageRef.putFile(imageUri).addOnSuccessListener { taskSnapshot ->
-            taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
-                _imageUrl.value = uri.toString()
+        val fileName = "images/${UUID.randomUUID()}.jpg"  // Generăm numele fișierului
+        val storageRef = FirebaseStorage.getInstance().reference.child(fileName)
+        storageRef.putFile(imageUri).continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
             }
+            storageRef.downloadUrl  // Solicităm URL-ul după încărcare
+        }.addOnSuccessListener { uri ->
+            val imageUrl = uri.toString()
+            _imageName.value = imageUrl  // Salvăm URL-ul complet
         }.addOnFailureListener {
-            //exception -> {onEvent(exception)}
+            // Tratați cazurile de eroare, cum ar fi revenirea la o valoare implicită sau gestionarea erorilor
         }
     }
+
     fun setImageUri(uri: Uri?) {
         _imageUri.value = uri
         uri?.let { uploadImageToFirebaseStorage(it) }

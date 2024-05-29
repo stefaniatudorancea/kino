@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.kino.app.EventBus
 import com.example.kino.data.DOCTOR_NODE
 import com.example.kino.data.DoctorData
 import com.example.kino.data.ExerciseDataDb
@@ -41,6 +42,9 @@ class RoutineViewModel: ViewModel() {
     private val _showAssignDialog = MutableStateFlow(false)
     val showAssignDialog = _showAssignDialog.asStateFlow()
 
+    private val _showDeleteRoutineDialog = MutableStateFlow(false)
+    val showDeleteRoutineDialog = _showDeleteRoutineDialog.asStateFlow()
+
     var fetchRoutinesProcess = mutableStateOf(false)
 
     init{
@@ -55,6 +59,14 @@ class RoutineViewModel: ViewModel() {
 
     fun dismissAssignDialog() {
         _showAssignDialog.value = false
+    }
+
+    fun showDeleteRoutineDialog() {
+        _showDeleteRoutineDialog.value = true
+    }
+
+    fun dismissDeleteRoutineDialog() {
+        _showDeleteRoutineDialog.value = false
     }
 
     fun onEvent(event: RoutineUIEvent){
@@ -116,69 +128,94 @@ class RoutineViewModel: ViewModel() {
         }
     }
 
-fun fetchRoutines(uidDoctor: String) {
-    fetchRoutinesProcess.value = true
-    viewModelScope.launch(Dispatchers.IO) {
-        try {
-            val docRef = db.collection("Doctor").document(uidDoctor)
-            docRef.collection("routines").get().addOnSuccessListener { querySnapshot ->
-                if (!querySnapshot.isEmpty) {
-                    val routinesList = querySnapshot.documents.mapNotNull { document ->
-                        try {
-                            val routineData = document.data
-                            val routineId = document.id
-                            val routineName = routineData?.get("name") as? String ?: ""
-                            val disease = routineData?.get("disease") as? String ?: ""
-                            val exercisesListMap = routineData?.get("exercises") as? List<Map<String, Any>> ?: listOf()
-
-                            val exercises = exercisesListMap.mapNotNull { exerciseMap ->
-                                try {
-                                    val exerciseData = exerciseMap["exercise"] as? Map<String, Any>
-                                    if (exerciseData != null) {
-                                        RoutineExerciseData(
-                                            exercise = ExerciseDataDb(
-                                                id = exerciseData["id"] as? String ?: "",
-                                                name = exerciseData["name"] as? String ?: "",
-                                                description = exerciseData["description"] as? String ?: "",
-                                                videoName = exerciseData["videoName"] as? String
-                                            ),
-                                            series = exerciseMap["series"] as? Int ?: 0,
-                                            repetitions = exerciseMap["repetitions"] as? Int ?: 0
-                                        )
-                                    } else null
-                                } catch (e: Exception) {
-                                    Log.e(TAG, "Error converting exercise data: $e")
-                                    null
-                                }
-                            }
-
-                            RoutineDataDb(
-                                id = routineId,
-                                name = routineName,
-                                disease = disease,
-                                exercise = exercises.toMutableList()
-                            )
-                        } catch (e: Exception) {
-                            Log.e(TAG, "Error converting routine data: $e")
-                            null
-                        }
+    fun deleteRoutine(routine: RoutineDataDb) {
+        if (routine.id.isNotEmpty()) {
+            val doctorUid = currentDoctor
+            if (doctorUid != null) {
+                db.collection("Doctor").document(doctorUid)
+                    .collection("routines").document(routine.id)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Routine successfully deleted")
+                        fetchRoutines(doctorUid)
+                        PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen)
                     }
-                    _routines.value = routinesList
-                    fetchRoutinesProcess.value = false
-                    Log.d(TAG, "Routines loaded successfully with exercises")
-                } else {
-                    Log.d(TAG, "No routines found")
-                    _routines.value = listOf()
-                }
-            }.addOnFailureListener { exception ->
-                Log.d(TAG, "Error getting document", exception)
-                _routines.value = listOf()
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Error deleting routine", e)
+                    }
+            } else {
+                Log.e(TAG, "Error: Doctor UID is null")
             }
-        } catch (e: Exception) {
-            Log.w(TAG, "Error preparing to fetch Routines", e)
+        } else {
+            Log.e(TAG, "Error: Routine ID is empty")
         }
     }
-}
+
+
+    fun fetchRoutines(uidDoctor: String) {
+        fetchRoutinesProcess.value = true
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val docRef = db.collection("Doctor").document(uidDoctor)
+                docRef.collection("routines").get().addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        val routinesList = querySnapshot.documents.mapNotNull { document ->
+                            try {
+                                val routineData = document.data
+                                val routineId = document.id
+                                val routineName = routineData?.get("name") as? String ?: ""
+                                val disease = routineData?.get("disease") as? String ?: ""
+                                val exercisesListMap = routineData?.get("exercises") as? List<Map<String, Any>> ?: listOf()
+
+                                val exercises = exercisesListMap.mapNotNull { exerciseMap ->
+                                    try {
+                                        val exerciseData = exerciseMap["exercise"] as? Map<String, Any>
+                                        val series = exerciseMap["series"] as? Long ?: 0  // Correctly accessing "series" from the parent map
+                                        val repetitions = exerciseMap["repetitions"] as? Long ?: 0
+                                        RoutineExerciseData(
+                                            exercise = ExerciseDataDb(
+                                                id = exerciseData?.get("id") as? String ?: "",
+                                                name = exerciseData?.get("name") as? String ?: "",
+                                                description = exerciseData?.get("description") as? String ?: "",
+                                                videoName = exerciseData?.get("videoName") as? String
+                                            ),
+                                            series = series.toInt(),  // Correctly accessing "series" from the parent map
+                                            repetitions = repetitions.toInt()  // Correctly accessing "repetitions" from the parent map
+                                        )
+                                    } catch (e: Exception) {
+                                        Log.e(TAG, "Error converting exercise data: $e")
+                                        null
+                                    }
+                                }
+
+                                RoutineDataDb(
+                                    id = routineId,
+                                    name = routineName,
+                                    disease = disease,
+                                    exercise = exercises.toMutableList()
+                                )
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error converting routine data: $e")
+                                null
+                            }
+                        }
+                        _routines.value = routinesList
+                        fetchRoutinesProcess.value = false
+                        Log.d(TAG, "Routines loaded successfully with exercises")
+                    } else {
+                        Log.d(TAG, "No routines found")
+                        _routines.value = listOf()
+                    }
+                }.addOnFailureListener { exception ->
+                    Log.d(TAG, "Error getting document", exception)
+                    _routines.value = listOf()
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Error preparing to fetch Routines", e)
+            }
+        }
+    }
+
 
     fun selectRoutine(routine: RoutineDataDb){
         _selectedRoutine.value = routine
@@ -198,7 +235,8 @@ fun fetchRoutines(uidDoctor: String) {
                         "videoName" to exercise.exercise?.videoName,
                         "repetitions" to exercise.repetitions,
                         "series" to exercise.series,
-                        "done" to false
+                        "done" to false,
+
                     )
                 }
 
@@ -211,11 +249,16 @@ fun fetchRoutines(uidDoctor: String) {
                         "creationDate" to System.currentTimeMillis()
                     ),
                     "startDate" to System.currentTimeMillis(),
+                    "doctorUid" to currentDoctor,
                     "exercisesDone" to 0
                 )
 
                 assignedRoutinesRef.add(routineDetails).addOnSuccessListener { documentReference ->
                     Log.d(TAG, "Routine successfully assigned to patient")
+                    viewModelScope.launch {
+                        EventBus.postEvent("AssignConversation")
+                    }
+                    PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen)
                     userDocRef.update("currentRoutineId", documentReference.id)
                 }.addOnFailureListener { e ->
                     Log.e(TAG, "Error assigning routine to patient", e)
@@ -225,7 +268,5 @@ fun fetchRoutines(uidDoctor: String) {
             }
         }
     }
-
-
 
 }

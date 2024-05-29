@@ -96,11 +96,18 @@ fun DoctorCard(doctorsViewModel: DoctorProfileViewModel = viewModel(), user: Doc
 
 @Composable
 fun ImageForCard(imageUrl: String?) {
-        val painter = if (!imageUrl.isNullOrEmpty()) {
-            rememberImagePainter(data = imageUrl)
-        } else {
-            painterResource(id = R.drawable.default_profile)
-        }
+    val painter = if (!imageUrl.isNullOrEmpty()) {
+        rememberImagePainter(
+            data = imageUrl,
+            builder = {
+                placeholder(R.drawable.default_profile) // imagine afișată în timpul încărcării
+                error(R.drawable.default_profile) // imagine afișată în caz de eroare
+            }
+        )
+    } else {
+        painterResource(id = R.drawable.default_profile)
+    }
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -117,6 +124,7 @@ fun ImageForCard(imageUrl: String?) {
         )
     }
 }
+
 
 @Composable
 fun FavDoctorDialog(doctorViewModel: DoctorProfileViewModel = viewModel()) {
@@ -248,7 +256,6 @@ fun ReviewList(reviews: List<DoctorReview>, doctorProfileViewModel: DoctorProfil
             }
             Spacer(modifier = Modifier.height(30.dp))
         }
-
     }
 }
 

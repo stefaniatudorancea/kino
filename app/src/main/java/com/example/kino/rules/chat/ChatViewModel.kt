@@ -3,11 +3,13 @@ package com.example.kino.rules.chat
 import android.content.ContentValues
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.kino.app.EventBus
 import com.example.kino.data.ChatData
+import com.example.kino.data.FeedbackData
 import com.example.kino.data.Message
 import com.example.kino.data.USER_NODE
 import com.example.kino.data.UserDataForDoctorList
@@ -43,6 +45,8 @@ class ChatViewModel: ViewModel() {
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
+
+
 
     private lateinit var messagesRef: DatabaseReference
     private var childEventListener: ChildEventListener? = null
@@ -171,5 +175,6 @@ class ChatViewModel: ViewModel() {
         Log.d(TAG, "Inside_printState")
         Log.d(TAG, chatUIState.value.toString())
     }
+
 
 }
