@@ -137,6 +137,7 @@ fun DoctorProfileScreen(doctorProfileViewModel: DoctorProfileViewModel = viewMod
                                         isEnabled = true
                                     )
                                 }
+                                Spacer(modifier = Modifier.height(20.dp))
 
                             }
                         }

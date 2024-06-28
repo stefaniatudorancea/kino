@@ -150,8 +150,8 @@ fun CreateExFieldComponent(
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 40.dp, vertical = 5.dp)
-            .clip(componentShapes.small),
+            .padding(horizontal = 40.dp, vertical = 5.dp),
+            //.clip(componentShapes.small),
         shape = RoundedCornerShape(50),
         value = textValue.value,
         label = { Text(text = labelValue) },
@@ -176,10 +176,10 @@ fun ExerciseDetailsCard(label: String, value: String?) {
             .fillMaxWidth()
             .padding(vertical = 5.dp, horizontal = 50.dp)
             .border(2.dp, Color.Gray, RoundedCornerShape(30.dp)),
-        shape = RoundedCornerShape(30),
+        shape = RoundedCornerShape(10),
         colors = CardDefaults.cardColors(colorResource(id = R.color.white))
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Text(text = "$label", style = MaterialTheme.typography.bodyMedium)
             Text(text = "$value", style = MaterialTheme.typography.bodyLarge)
 

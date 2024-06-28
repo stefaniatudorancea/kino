@@ -3,6 +3,10 @@ package com.example.kino.rules.chat
 import android.content.ContentValues
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
+import javax.crypto.spec.IvParameterSpec
+import android.util.Base64
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +37,10 @@ import javax.inject.Inject
 
 class ChatViewModel: ViewModel() {
     private val TAG = ChatViewModel::class.simpleName
+
+    private val AES_KEY = "cheieSecreta1234" // Asigură-te că cheia are lungimea de 16 bytes
+    private val AES_IV = ByteArray(16)
+
     var chatUIState = mutableStateOf(ChatUIState())
 
     var currentUser = FirebaseAuth.getInstance().currentUser!!.uid
@@ -42,6 +50,10 @@ class ChatViewModel: ViewModel() {
 
     private val _conversationPartener = MutableLiveData<UserDataForDoctorList>()
     val conversationPartener: MutableLiveData<UserDataForDoctorList> = _conversationPartener
+
+    private val _conversationDoctorPartener = MutableLiveData<UserDataForDoctorList>()
+    val conversationDoctorPartener: MutableLiveData<UserDataForDoctorList> = _conversationDoctorPartener
+
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
@@ -66,6 +78,8 @@ class ChatViewModel: ViewModel() {
         }
     }
 
+
+
     init{
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         if (uid != null) {
@@ -83,14 +97,14 @@ class ChatViewModel: ViewModel() {
     }
 
     fun sendMessage(chatId: String, senderId: String, messageText: String) {
+        val encryptedMessage = encryptMessage(messageText)
         val database = FirebaseDatabase.getInstance().reference
         val messagesRef = database.child("conversations").child(chatId).child("messages")
-
         val messageId = messagesRef.push().key
         val timestamp = System.currentTimeMillis().toString()
 
         if (messageId != null ) {
-            val message = Message(messageId, senderId, messageText, timestamp)
+            val message = Message(messageId, senderId, encryptedMessage, timestamp)
             messagesRef.child(messageId).setValue(message).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d("sendMessage", "Mesaj trimis cu succes.")
@@ -122,14 +136,17 @@ class ChatViewModel: ViewModel() {
 
             childEventListener = object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    snapshot.getValue(Message::class.java)?.let { message ->
+                    snapshot.getValue(Message::class.java)?.let { encryptedMessage ->
+                        val decryptedMessageText = decryptMessage(encryptedMessage.text)
+                        val decryptedMessage = encryptedMessage.copy(text = decryptedMessageText)
                         val updatedMessages = _messages.value.toMutableList().apply {
-                            add(message)
+                            add(decryptedMessage)
                         }.sortedBy { it.timestamp }
                         _messages.value = updatedMessages
                         fetchChatProcess.value = false
                     }
                 }
+
 
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
                 override fun onChildRemoved(snapshot: DataSnapshot) {}
@@ -177,4 +194,24 @@ class ChatViewModel: ViewModel() {
     }
 
 
+    fun encryptMessage(message: String): String {
+        val secretKey = SecretKeySpec(AES_KEY.toByteArray(charset("UTF-8")), "AES")
+        val iv = IvParameterSpec(AES_IV)
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv)
+
+        val encrypted = cipher.doFinal(message.toByteArray(Charsets.UTF_8))
+        return Base64.encodeToString(encrypted, Base64.DEFAULT)
+    }
+
+    fun decryptMessage(encryptedMessage: String): String {
+        val secretKey = SecretKeySpec(AES_KEY.toByteArray(charset("UTF-8")), "AES")
+        val iv = IvParameterSpec(AES_IV)
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, iv)
+
+        val decodedValue = Base64.decode(encryptedMessage, Base64.DEFAULT)
+        val decrypted = cipher.doFinal(decodedValue)
+        return String(decrypted, Charsets.UTF_8)
+    }
 }

@@ -45,6 +45,42 @@ class PatientsListViewModel: ViewModel() {
 
     init {
         loadPatientsForDoctor()
+        startPatientsListener()
+    }
+
+    private fun startPatientsListener() {
+        val doctorId = auth.currentUser?.uid
+        doctorId?.let { id ->
+            val docRef = db.collection(DOCTOR_NODE).document(id)
+            docRef.addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e(TAG, "Listen failed", error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val patientsListMap = snapshot.get("patientsList") as? List<Map<String, Any>> ?: listOf()
+                    val patients = patientsListMap.mapNotNull { patientMap ->
+                        try {
+                            val patientDetails = patientMap["value"] as Map<String, Any>
+                            UserDataForDoctorList(
+                                uid = patientDetails["uid"] as? String ?: "",
+                                firstName = patientDetails["firstName"] as? String ?: "",
+                                lastName = patientDetails["lastName"] as? String ?: "",
+                                imageUrl = patientDetails["imageUrl"] as? String
+                            )
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error converting patient data: $e")
+                            null
+                        }
+                    }
+                    _patientsList.value = patients
+                } else {
+                    Log.d(TAG, "Current data: null")
+                    _patientsList.value = listOf()
+                }
+            }
+        }
     }
 
     fun loadPatientsForDoctor() {
@@ -83,6 +119,10 @@ class PatientsListViewModel: ViewModel() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "PatientsListViewModel"
     }
 
 }

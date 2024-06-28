@@ -114,8 +114,8 @@ fun RoutineExerciseItem(exercise: ExerciseDataDb, routineViewModel: RoutineViewM
                         modifier = Modifier
                             .padding(horizontal = 10.dp)
                             .height(60.dp)
-                            .width(120.dp)
-                            .clip(componentShapes.small),
+                            .width(120.dp),
+                            //.clip(componentShapes.small),
                         shape = RoundedCornerShape(50),
                         value = series,
                         label = { Text(text = stringResource(id = R.string.series)) },
@@ -131,8 +131,8 @@ fun RoutineExerciseItem(exercise: ExerciseDataDb, routineViewModel: RoutineViewM
                         modifier = Modifier
                             .padding(horizontal = 10.dp)
                             .height(60.dp)
-                            .width(120.dp)
-                            .clip(componentShapes.small),
+                            .width(120.dp),
+                           // .clip(componentShapes.small)
                         shape = RoundedCornerShape(50),
                         value = repetitions,
                         label = { Text(text = stringResource(id = R.string.repetitions)) },
@@ -149,6 +149,7 @@ fun RoutineExerciseItem(exercise: ExerciseDataDb, routineViewModel: RoutineViewM
                             exercise, series.toInt(), repetitions.toInt()))
                     }
                 }
+                Spacer(modifier = (Modifier.height(5.dp)))
             }
         }
     }
@@ -205,8 +206,8 @@ fun CreateRoutineFieldComponent(
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 25.dp, vertical = 5.dp)
-            .clip(componentShapes.small),
+            .padding(horizontal = 25.dp, vertical = 5.dp),
+            //.clip(componentShapes.small),
         shape = RoundedCornerShape(50),
         value = textValue.value,
         label = { Text(text = labelValue) },

@@ -73,7 +73,7 @@ class NavigationViewModel: ViewModel() {
             unselectedIcon = Icons.Outlined.Person,
             hasNews = false,
             badgeCount = null,
-            destination = Screen.ProfileDoctorScreen
+            destination = Screen.MyDoctorProfileScreen
         ),
     )
 
@@ -95,7 +95,7 @@ class NavigationViewModel: ViewModel() {
                 PostOfficeAppRouter.navigateTo(Screen.RoutinesListScreen)
             }
             is NavigationUIEvent.ProfileDoctorButtonClicked -> {
-                PostOfficeAppRouter.navigateTo(Screen.ProfileDoctorScreen)
+                PostOfficeAppRouter.navigateTo(Screen.MyDoctorProfileScreen)
             }
         }
     }

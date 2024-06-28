@@ -76,7 +76,7 @@ class FeedbackRoutineViewModel: ViewModel() {
 
     fun fetchRoutineFeedbacks() {
         selectedPatient.value?.let {
-            db.collection("User").document(it)
+            db.collection(USER_NODE).document(it)
                 .collection("assignedRoutines")
                 .whereEqualTo("doctorUid", currentDoctor)
                 .get()

@@ -130,7 +130,7 @@ class ExerciseViewModel: ViewModel() {
     private fun fetchExercises(uidDoctor: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val snapshot = db.collection("Doctor")
+                val snapshot = db.collection(DOCTOR_NODE)
                     .document(uidDoctor)
                     .collection("exercises")
                     .get()
@@ -177,7 +177,7 @@ class ExerciseViewModel: ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (exercise.id.isNotEmpty()) {
-                    db.collection("Doctor").document(currentDoctor!!)
+                    db.collection(DOCTOR_NODE).document(currentDoctor!!)
                         .collection("exercises").document(exercise.id)
                         .delete()
                         .await()

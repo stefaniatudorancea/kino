@@ -92,14 +92,16 @@ fun DoctorSecondSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = view
                     errorStatus = doctorSignupViewModel.registartionUIState.value.graduationYearError,
                     fieldForNumbers = true
                 )
-                MyTextFieldComponent(
-                    labelValue = stringResource(id = R.string.linkedln),
-                    painterResource = painterResource(id = R.drawable.social),
-                    onTextSelected = {
-                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.LinkedlnChanged(it))
-                    },
-                    errorStatus = doctorSignupViewModel.registartionUIState.value.linkedlnError
-                )
+
+
+//                MyTextFieldComponent(
+//                    labelValue = stringResource(id = R.string.linkedln),
+//                    painterResource = painterResource(id = R.drawable.social),
+//                    onTextSelected = {
+//                        doctorSignupViewModel.onEvent(DoctorSignupUIEvent.LinkedlnChanged(it))
+//                    },
+//                    errorStatus = doctorSignupViewModel.registartionUIState.value.linkedlnError
+//                )
                 CheckboxComponent(
                     onTextSelected = {
                         PostOfficeAppRouter.navigateTo(Screen.TermsAndConditionsScreen)
@@ -108,6 +110,7 @@ fun DoctorSecondSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = view
                         doctorSignupViewModel.onEvent(DoctorSignupUIEvent.PrivacyPolicyCheckBoxClicked(it))
                     },
                 )
+                Spacer(modifier = Modifier.height(55.dp))
                 Spacer(modifier = Modifier.height(65.dp))
                 ButtonComponent(value = stringResource(id = R.string.register),
                     onButtonClicked = {
@@ -117,8 +120,8 @@ fun DoctorSecondSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = view
                     imageVector = null,
                     brush = Brush.horizontalGradient(
                         listOf(
-                            colorResource(id = R.color.primaryPurple),
-                            colorResource(id = R.color.secondaryPurple),
+                            colorResource(id = R.color.primaryBlue),
+                            colorResource(id = R.color.secondaryBlue),
                         )
                     )
 
@@ -128,7 +131,7 @@ fun DoctorSecondSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = view
                     PostOfficeAppRouter.navigateTo(Screen.DoctorLoginScreen)
                 })
                 Spacer(modifier = Modifier.height(47.dp))
-                ButtonComponent(value = stringResource(id = R.string.im_physiotherapist),
+                ButtonComponent(value = stringResource(id = R.string.im_patient),
                     onButtonClicked = {
                         doctorSignupViewModel.onEvent(DoctorSignupUIEvent.PatientButtonClicked )
                     },
@@ -136,8 +139,8 @@ fun DoctorSecondSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = view
                     imageVector = null,
                     brush = Brush.horizontalGradient(
                         listOf(
-                            colorResource(id = R.color.primaryBlue),
-                            colorResource(id = R.color.secondaryBlue),
+                            colorResource(id = R.color.primaryPurple),
+                            colorResource(id = R.color.secondaryPurple),
                         )
                     ),
                 )

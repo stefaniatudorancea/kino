@@ -182,6 +182,7 @@ class DoctorProfileViewModel: ViewModel() {
                         EventBus.postEvent("UpdateConversationId")
                     }
                     selectedDoctor.value?.let { it1 -> initiateChatWithDoctor(it1.uid) }
+                    PostOfficeAppRouter.navigateTo(Screen.DoctorsScreen)
                 }
                 .addOnFailureListener { e ->
                     // Aici poți să tratezi cazul în care actualizarea a eșuat

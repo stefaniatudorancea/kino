@@ -61,6 +61,7 @@ fun ProfileScreen(navigationViewModel: NavigationViewModel = viewModel(), userVi
                     Spacer(modifier = Modifier.height(10.dp))
                     UserDetailsCard(stringResource(id = R.string.name), "${user?.lastName} ${user?.firstName}")
                     UserDetailsCard(stringResource(id = R.string.email), user?.email)
+                    Spacer(modifier = Modifier.height(270.dp))
                     ButtonComponent(
                         value = stringResource(id = R.string.logout),
                         onButtonClicked = { userViewModel.onEvent(UserUIEvent.LogoutButtonClicked) },

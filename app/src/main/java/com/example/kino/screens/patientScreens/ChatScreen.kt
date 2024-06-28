@@ -36,18 +36,20 @@ import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.example.kino.rules.chat.ChatUIEvent
 import com.example.kino.rules.chat.ChatViewModel
+import com.example.kino.rules.doctorList.DoctorsViewModel
 import com.example.kino.rules.navigation.NavigationViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ChatsScreen(navigationViewModel: NavigationViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel(), patientRoutineViewModel: PatientRoutineViewModel = viewModel()) {
+fun ChatsScreen(navigationViewModel: NavigationViewModel = viewModel(), chatViewModel: ChatViewModel = viewModel(), patientRoutineViewModel: PatientRoutineViewModel = viewModel(), doctorsViewModel: DoctorsViewModel = viewModel()) {
+    val conversationPartener = doctorsViewModel.favDoctor.value
     Scaffold(
         bottomBar = {
             NavigationAppBar(navigationItems = navigationViewModel.navigationItemsList, pageIndex = navigationViewModel.navigationItemsList[1].index)
         },
         topBar = {
             AppToolbar(
-                toolbarTitle = stringResource(id = R.string.chats),
+                toolbarTitle = if(conversationPartener != null) "${conversationPartener.firstName} ${conversationPartener.lastName}" else "Chat",
                 isDoctor = false
             )
         },

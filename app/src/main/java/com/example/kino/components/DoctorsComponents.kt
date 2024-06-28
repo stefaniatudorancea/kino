@@ -88,7 +88,7 @@ fun DoctorCard(doctorsViewModel: DoctorProfileViewModel = viewModel(), user: Doc
             )
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { doctorsViewModel.selectDoctor(user) }) {
-                Icon(painter = painterResource(id = R.drawable.more_details), contentDescription = "details")
+                Icon(painter = painterResource(id = R.drawable.more_details), contentDescription = "details",  tint = Color.White)
             }
         }
     }

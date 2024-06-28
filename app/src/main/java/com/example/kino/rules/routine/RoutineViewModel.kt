@@ -132,7 +132,7 @@ class RoutineViewModel: ViewModel() {
         if (routine.id.isNotEmpty()) {
             val doctorUid = currentDoctor
             if (doctorUid != null) {
-                db.collection("Doctor").document(doctorUid)
+                db.collection(DOCTOR_NODE).document(doctorUid)
                     .collection("routines").document(routine.id)
                     .delete()
                     .addOnSuccessListener {
@@ -156,7 +156,7 @@ class RoutineViewModel: ViewModel() {
         fetchRoutinesProcess.value = true
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val docRef = db.collection("Doctor").document(uidDoctor)
+                val docRef = db.collection(DOCTOR_NODE).document(uidDoctor)
                 docRef.collection("routines").get().addOnSuccessListener { querySnapshot ->
                     if (!querySnapshot.isEmpty) {
                         val routinesList = querySnapshot.documents.mapNotNull { document ->

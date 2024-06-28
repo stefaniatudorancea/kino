@@ -55,7 +55,7 @@ fun PatientCard(chatViewModel: ChatViewModel = viewModel(), user: UserDataForDoc
                 feedbackRoutineViewModel.selectPatient(user.uid)
                 PostOfficeAppRouter.navigateTo(Screen.DoctorChatScreen)
             }) {
-                Icon(painter = painterResource(id = R.drawable.more_details), contentDescription = "details")
+                Icon(painter = painterResource(id = R.drawable.more_details), contentDescription = "details",  tint = Color.White)
             }
         }
     }

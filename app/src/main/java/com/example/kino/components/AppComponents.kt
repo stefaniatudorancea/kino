@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -53,6 +54,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -152,7 +155,12 @@ fun PasswordTextFieldComponent(labelValue: String, painterResource: Painter, onT
             }
         },
         visualTransformation = if (passwordVisibile.value) VisualTransformation.None else PasswordVisualTransformation(),
-        isError = !errorStatus
+        isError = !errorStatus,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            autoCorrect = false,
+            capitalization = KeyboardCapitalization.None
+        )
     )
 }
 

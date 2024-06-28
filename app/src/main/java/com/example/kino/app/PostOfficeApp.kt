@@ -21,6 +21,7 @@ import com.example.kino.screens.patientScreens.DoctorProfileScreen
 import com.example.kino.screens.doctorScreens.DoctorSecondSignupScreen
 import com.example.kino.screens.doctorScreens.ExerciseScreen
 import com.example.kino.screens.doctorScreens.ExercisesListScreen
+import com.example.kino.screens.doctorScreens.MyDoctorProfileScreen
 import com.example.kino.screens.doctorScreens.PatientsListScreen
 import com.example.kino.screens.doctorScreens.ProfileDoctorScreen
 import com.example.kino.screens.doctorScreens.RoutineScreen
@@ -109,6 +110,9 @@ fun PostOfficeApp(){
                 }
                 is Screen.PatientRoutineScreen -> {
                     PatientRoutineScreen()
+                }
+                is Screen.MyDoctorProfileScreen -> {
+                    MyDoctorProfileScreen()
                 }
             }
         }

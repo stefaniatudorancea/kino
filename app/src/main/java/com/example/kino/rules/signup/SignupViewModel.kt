@@ -156,7 +156,7 @@ class SignupViewModel : ViewModel() {
                         email = registartionUIState.value.email,
                         imageUrl = this.imageName.value
                     )
-                    PostOfficeAppRouter.navigateTo(Screen.HomeScreen)
+                    PostOfficeAppRouter.navigateTo(Screen.DoctorsScreen)
                 }
             }
             .addOnFailureListener {

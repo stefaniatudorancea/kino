@@ -27,6 +27,7 @@ sealed class Screen(){
     object RoutineScreen: Screen()
     object PatientExerciseScreen: Screen()
     object PatientRoutineScreen: Screen()
+    object MyDoctorProfileScreen: Screen()
 }
 
 object PostOfficeAppRouter{

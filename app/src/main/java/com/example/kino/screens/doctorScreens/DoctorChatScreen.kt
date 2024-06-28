@@ -21,7 +21,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -66,7 +68,7 @@ fun DoctorChatScreen(feedbackRoutineViewModel: FeedbackRoutineViewModel = viewMo
     Scaffold(
         topBar = {
             AppToolbar(
-                toolbarTitle = if(conversationPartener != null) "${conversationPartener.firstName} ${conversationPartener.lastName}" else "Routin3e", //Numele pacientului
+                toolbarTitle = if(conversationPartener != null) "${conversationPartener.firstName} ${conversationPartener.lastName}" else "Routine", //Numele pacientului
                 isDoctor = true,
                 chatScreen = true,
                 photoUrl = conversationPartener?.imageUrl
@@ -84,6 +86,7 @@ fun DoctorChatScreen(feedbackRoutineViewModel: FeedbackRoutineViewModel = viewMo
             Column(modifier = Modifier.fillMaxSize()) {
                 val messages = chatViewModel.messages.collectAsState().value
                 val scrollState = rememberLazyListState()
+                val coroutineScope = rememberCoroutineScope()
                 val viewFeedbackDialog = feedbackRoutineViewModel.showFeedbackDialog.collectAsState().value
                 val feedbacks = feedbackRoutineViewModel.routineFeedbacks.value
                 Row(
@@ -137,7 +140,7 @@ fun DoctorChatScreen(feedbackRoutineViewModel: FeedbackRoutineViewModel = viewMo
                     state = scrollState,
                     modifier = Modifier
                         .weight(1f)
-                        .padding(bottom = 64.dp))
+                        .padding(bottom = 0.dp))
                 {
                     items(messages) { message ->
                         ReceivedMessage(message = message, chatViewModel.currentUser)

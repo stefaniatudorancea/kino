@@ -117,7 +117,7 @@ fun DoctorFirstSignupScreen(doctorSignupViewModel: DoctorSignupViewModel = viewM
                 ClickableLoginTextComponent(onTextSelected = {
                     PostOfficeAppRouter.navigateTo(Screen.DoctorLoginScreen)
                 })
-                Spacer(modifier = Modifier.height(118.dp))
+                Spacer(modifier = Modifier.height(116.dp))
                 ButtonComponent(value = stringResource(id = R.string.im_patient),
                     onButtonClicked = {
                         doctorSignupViewModel.onEvent(DoctorSignupUIEvent.PatientButtonClicked)

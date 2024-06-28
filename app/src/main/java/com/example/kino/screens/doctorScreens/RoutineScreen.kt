@@ -33,18 +33,23 @@ import com.example.kino.components.BackButton
 import com.example.kino.components.ButtonComponent
 import com.example.kino.components.DeleteRoutineDialog
 import com.example.kino.components.ExerciseDetailsCard
+import com.example.kino.components.NavigationAppBar
 import com.example.kino.components.RoutineItem
 import com.example.kino.components.SeeRoutineExerciseItem
 import com.example.kino.navigation.PostOfficeAppRouter
 import com.example.kino.navigation.Screen
 import com.example.kino.rules.exercise.ExerciseViewModel
+import com.example.kino.rules.navigation.NavigationViewModel
 import com.example.kino.rules.routine.RoutineViewModel
 
 
 @Composable
-fun RoutineScreen(routineViewModel: RoutineViewModel = viewModel(), exerciseViewModel: ExerciseViewModel = viewModel()){
+fun RoutineScreen(navigationViewModel: NavigationViewModel = viewModel(), routineViewModel: RoutineViewModel = viewModel(), exerciseViewModel: ExerciseViewModel = viewModel()){
     val routine = routineViewModel.selectedRoutine.value
     Scaffold(
+        bottomBar = {
+            NavigationAppBar(navigationItems = navigationViewModel.navigationItemsList, pageIndex = navigationViewModel.navigationItemsList[2].index)
+        },
         topBar = {
             if (routine != null) {
                 AppToolbar(toolbarTitle = routine.name, isDoctor = true)
